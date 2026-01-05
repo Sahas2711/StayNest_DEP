@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService {
         String contactFaqLink = "http://localhost:3000/contact-us";
         String subject = "Welcome to StayNest! Your Nest Away From Home Awaits!";
 
-        //String htmlBody = emailService.genrateWelcomeMessage(userName, browsePgLink, contactFaqLink);
-        emailService.sendEmail(user.getEmail(), subject, htmlBody);
+        String htmlBody = emailService.genrateWelcomeMessage(userName, browsePgLink, contactFaqLink);
+        //emailService.sendEmail(user.getEmail(), subject, htmlBody);
 
         logger.info("Welcome email sent to: {}", user.getEmail());
 
