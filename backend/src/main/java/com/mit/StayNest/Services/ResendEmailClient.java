@@ -24,6 +24,11 @@ public class ResendEmailClient {
     }
 
     public void sendHtmlEmail(String to, String subject, String html) {
+
+        if (fromEmail == null || fromEmail.isBlank()) {
+            throw new IllegalStateException("Resend FROM email is not configured");
+        }
+
         Map<String, Object> payload = Map.of(
                 "from", fromEmail,
                 "to", List.of(to),
@@ -35,9 +40,18 @@ public class ResendEmailClient {
                 .uri("/emails")
                 .bodyValue(payload)
                 .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError(),
+                        resp -> resp.bodyToMono(String.class)
+                                .map(body -> new RuntimeException("Resend 4xx error: " + body))
+                )
+                .onStatus(
+                        status -> status.is5xxServerError(),
+                        resp -> resp.bodyToMono(String.class)
+                                .map(body -> new RuntimeException("Resend 5xx error: " + body))
+                )
                 .bodyToMono(String.class)
-                .doOnSuccess(res -> logger.info("Email sent via Resend to {}", to))
-                .doOnError(err -> logger.error("Resend email failed", err))
-                .block(); // OK for transactional emails
+                .doOnSuccess(res -> logger.info("✅ Resend email sent to {}", to))
+                .block();
     }
 }
