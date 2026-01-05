@@ -1,0 +1,670 @@
+/* Tenant Dashboard – Notifications Styles */
+
+.tenant-dashboard-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f7fafc;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+.sidebar {
+  width: 230px;
+  background: #fff;
+  border-right: 1.5px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2rem 1.2rem 1rem 1.2rem;
+  min-height: 100vh;
+}
+.sidebar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2AB7CA;
+  margin-bottom: 2.5rem;
+  letter-spacing: 1px;
+}
+.sidebar-nav {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #444;
+  font-size: 1.08rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar-link.active, .sidebar-link:hover {
+  background: #e6f7fa;
+  color: #2AB7CA;
+}
+
+.main-content {
+  flex: 1;
+  padding: 0 2.5rem 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0 1.2rem 0;
+}
+.welcome-message {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.profile-icon {
+  font-size: 2rem;
+  color: #2AB7CA;
+  cursor: pointer;
+}
+.notifications-bell {
+  position: relative;
+  font-size: 1.5rem;
+  color: #2AB7CA;
+  cursor: pointer;
+}
+.badge {
+  position: absolute;
+  top: -7px;
+  right: -10px;
+  background: #FF6B6B;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 7px;
+  min-width: 22px;
+  text-align: center;
+  box-shadow: 0 2px 8px #ff6b6b33;
+}
+
+.notifications-panel {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(42,183,202,0.07);
+  padding: 2rem 2rem 1.5rem 2rem;
+  margin-top: 0.5rem;
+  min-height: 500px;
+}
+.notifications-panel h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2AB7CA;
+  margin-bottom: 0.2rem;
+}
+.notifications-panel .subtitle {
+  color: #888;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.filter-dropdown {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  font-size: 1rem;
+  color: #2AB7CA;
+  background: #f7fafc;
+  outline: none;
+  font-weight: 500;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  padding: 0.4rem 1rem;
+  gap: 0.5rem;
+}
+.search-bar input {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  outline: none;
+  color: #222;
+  width: 180px;
+}
+.search-icon {
+  color: #2AB7CA;
+  font-size: 1.1rem;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  box-shadow: 0 2px 12px rgba(42,183,202,0.04);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  border-left: 5px solid #2AB7CA;
+  position: relative;
+}
+.notification-card.read {
+  opacity: 0.7;
+  border-left: 5px solid #e5e7eb;
+}
+.notification-card.unread {
+  background: #e6f7fa;
+  border-left: 5px solid #2AB7CA;
+}
+.notif-icon {
+  font-size: 1.7rem;
+  margin-right: 1.1rem;
+  margin-top: 2px;
+}
+.notif-content {
+  flex: 1;
+}
+.notif-title {
+  font-weight: 700;
+  color: #222;
+  font-size: 1.08rem;
+  margin-bottom: 0.2rem;
+}
+.notif-message {
+  color: #555;
+  font-size: 0.98rem;
+  margin-bottom: 0.1rem;
+}
+.notif-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 90px;
+  gap: 0.5rem;
+}
+.notif-time {
+  color: #888;
+  font-size: 0.93rem;
+}
+.status-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+.status-dot.unread {
+  background: #2AB7CA;
+}
+.status-dot.read {
+  background: #bbb;
+}
+
+.no-notifications {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #2AB7CA;
+}
+.no-bell {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  color: #FFC857;
+}
+.no-msg {
+  font-size: 1.15rem;
+  color: #222;
+  font-weight: 600;
+}
+
+/* Modal Styles */
+.notif-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.notif-modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(42,183,202,0.13);
+  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  min-width: 320px;
+  max-width: 95vw;
+  position: relative;
+  animation: fadeInPop 0.2s;
+}
+.notif-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.notif-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2AB7CA;
+}
+.notif-modal-time {
+  margin-left: auto;
+  color: #888;
+  font-size: 0.95rem;
+}
+.notif-modal-message {
+  color: #444;
+  font-size: 1.05rem;
+  margin-bottom: 1.2rem;
+}
+.notif-modal-close {
+  background: #2AB7CA;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.notif-modal-close:hover {
+  background: #218a9a;
+}
+
+@keyframes fadeInPop {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 60px;
+    padding: 1.2rem 0.3rem 1rem 0.3rem;
+    align-items: center;
+  }
+  .sidebar-logo {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  .sidebar-link {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.5rem;
+    justify-content: center;
+  }
+  .main-content {
+    padding: 0 0.5rem 1rem 0.5rem;
+  }
+  .notifications-panel {
+    padding: 1rem 0.5rem 1rem 0.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .tenant-dashboard-root {
+    flex-direction: column;
+  }
+  .sidebar {
+    flex-direction: row;
+    width: 100vw;
+    min-height: unset;
+    border-right: none;
+    border-bottom: 1.5px solid #e5e7eb;
+    padding: 0.5rem 0.2rem;
+    justify-content: space-around;
+  }
+  .main-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 1.2rem 0 0.7rem 0;
+  }
+  .notifications-panel {
+    min-height: 350px;
+  }
+  .filters-row {
+    display: none;
+  }
+  .mobile-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .mobile-tab-btn {
+    flex: 1;
+    background: #e6f7fa;
+    color: #2AB7CA;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mobile-tab-btn.active, .mobile-tab-btn:hover {
+    background: #2AB7CA;
+    color: #fff;
+  }
+}
+/* Add this to your CSS, ideally near the .quick-actions-grid definition
+   or in a general section that applies to all screen sizes. */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Example: 3 columns of equal width */
+    gap: 1.5rem; /* Space between cards */
+    /* Add padding to the grid container if needed to prevent cards from touching edges */
+    padding: 0 1rem; /* Adjust as necessary */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 1200px) { /* Adjust breakpoint as needed */
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+    }
+}
+
+@media (max-width: 768px) { /* Adjust breakpoint as needed */
+    .quick-actions-grid {
+        grid-template-columns: repeat(1, 1fr); /* 1 column on small screens */
+        padding: 0; /* Remove horizontal padding on very small screens if needed */
+    }
+}
+
+/* If the entire section is being hidden, ensure it's also visible */
+.quick-actions-section {
+    display: block; /* Or flex, depending on its internal layout */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Review your @media (max-width: 768px) block or any other media queries */
+/* Make sure there isn't a rule like this within those blocks: */
+/*
+@media (max-width: 768px) {
+    .quick-actions-section,
+    .quick-actions-grid {
+        display: none; // <--- REMOVE OR OVERRIDE THIS IF IT EXISTS!
+    }
+}
+*/
+
+
+/* Quick Actions Section */
+.quick-actions-section {
+  padding: 0 1rem;
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.quick-actions-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4a2c8c; /* Dark purple */
+  margin-bottom: 0.5rem;
+}
+
+.quick-actions-subtitle {
+  font-size: 1rem;
+  color: #8a7aa9; /* Light purple */
+  margin-bottom: 2rem;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+.quick-action-card {
+  background: #fff; /* Light purple background */
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+  
+    width: 352px;
+    height: 182px;
+
+}
+
+.quick-action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(74, 44, 140, 0.1);
+}
+
+.icon-bg {
+  background: #fff;
+  border-radius: 50%;
+  padding: 1rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.icon-bg svg {
+  font-size: 1.5rem;
+  color: #4a2c8c;
+}
+
+.action-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.action-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.action-title-row h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #4a2c8c;
+  margin: 0;
+}
+
+.action-arrow {
+  color: #4a2c8c;
+  font-size: 1rem;
+}
+
+.action-desc {
+  font-size: 0.9rem;
+  color: #8a7aa9;
+  margin: 0;
+}
+
+.accent-bar {
+  height: 5px;
+  width: 60%;
+  border-radius: 5px;
+  margin-top: 1rem;
+}
+
+.accent-bar.green {
+  background-color: #2ecc71; /* Green color */
+}
+.accent-bar.yellow {
+  background-color: #f1c40f; /* Yellow color */
+}
+.accent-bar.gray {
+  background-color: #bdc3c7; /* Gray color */
+}
+.accent-bar.purple {
+  background-color: #9b59b6; /* Purple color */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+}
+
+.hero-content p {
+  color:#dfdfdf
+}
+.section h2 {
+    color: #4a2c8c;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+.my-reviews-container {
+  min-height: 100vh;
+  background: linear-gradient(to right, #f9f7ff, #fff0e3);
+  padding-top: 70px;
+  font-family: 'Poppins', sans-serif;
+}
+/* Reviews Section */
+.reviews-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1.5fr); /* This will create two equal columns */
+  gap: 2rem;
+}
+
+.review-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(124, 95, 240, 0.12);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.pg-info {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.pg-thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.pg-details h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.location, .date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+.pagination {
+  display: flex;
+  justify-content: center; /* This is the key change */
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-list {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  gap: 10px; /* Optional: adds space between page number buttons */
+}
+
+.page-item {
+  display: inline;
+}
+
+.page-link {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  border-radius: 8px; /* Match the rounded style from your image */
+  background-color: #f0f0f0; /* Default background */
+  transition: all 0.3s ease;
+}
+
+.page-item.active .page-link {
+  background-color: #8a2be2; /* Your primary color for active state */
+  color: #fff;
+  border-color: #8a2be2;
+}
+
+.page-link:hover {
+  background-color: #ddd;
+}

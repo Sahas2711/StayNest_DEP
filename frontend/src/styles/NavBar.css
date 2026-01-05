@@ -1,0 +1,191 @@
+/* Navbar layout */
+.navbar {
+  background: linear-gradient(to right, #f9f7ff, #fff0e3);
+  padding: 1rem 2rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Logo */
+.navbar-logo a {
+  font-size: 5 rem;
+  font-weight: 900;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
+
+  background: linear-gradient(to right, #7c5ff0, #ffb366);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Center links */
+.navbar-center-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* Right: Login & Register */
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+/* Hamburger menu icon - initially hidden on desktop */
+.navbar-toggle {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #5e4b8b;
+  justify-self: end;
+}
+
+/* Common link styling */
+.navbar a {
+  color: #5e4b8b;
+  text-decoration: none;
+  font-size: 1.15rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar a:hover {
+  color: #ff9f59;
+}
+
+/* Login link */
+.login-link {
+  font-weight: bold;
+}
+
+/* Register button */
+.btn-register {
+  background-color: #ff9f59;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-register:hover {
+  background-color: #e8812f;
+  transform: translateY(-2px);
+}
+
+/* Icon styling */
+.nav-icon {
+  font-size: 1rem;
+}
+
+/* Responsive logo size */
+@media screen and (min-width: 1024px) {
+  .navbar-logo a {
+    font-size: 2.5 rem;
+    font-weight: 700;
+  }
+}
+
+/* ----------------- New Responsive Styles ----------------- */
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    /* Adjust grid for mobile: logo on the left, toggle on the right */
+    grid-template-columns: auto 1fr auto; 
+    padding: 1rem;
+  }
+
+  /* Hide center links on smaller screens */
+  .navbar-center-links {
+    display: none; 
+    /* The hamburger menu will control its visibility */
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white; /* Add a background for the dropdown menu */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  /* Show the hamburger menu icon on smaller screens */
+  .navbar-toggle {
+    display: block; 
+  }
+
+  /* Hide auth links and logo size */
+  .navbar-auth {
+    display: none;
+  }
+
+  .navbar-logo a {
+    font-size: 2.5rem;
+  }
+}
+
+/* Optional: Styles for when the mobile menu is open */
+.navbar-center-links.open {
+  display: flex;
+}
+/* Add this to hide the new mobile-specific auth links on desktop */
+.navbar-auth-mobile {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* -------------------- Responsive Styles -------------------- */
+@media screen and (max-width: 768px) {
+  /* ... (existing styles) ... */
+
+  .navbar-auth {
+    display: none; /* This hides the desktop auth links */
+  }
+  
+  .navbar-auth-mobile {
+    display: flex; /* This shows the new mobile auth links */
+  }
+
+  .navbar-center-links {
+    /* ... (existing styles for mobile menu) ... */
+    /* Add padding for better spacing */
+    padding: 2rem 1rem;
+  }
+  
+  /* You may want to style the mobile auth links to look like buttons */
+  .navbar-auth-mobile .login-link,
+  .navbar-auth-mobile .btn-register {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .navbar-auth-mobile .login-link {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .navbar-auth-mobile .btn-register {
+    background-color: var(--secondary-color);
+  }
+}

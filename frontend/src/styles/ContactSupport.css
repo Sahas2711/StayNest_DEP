@@ -1,0 +1,398 @@
+/* ContactSupport.css */
+/* --- Layout polish for Contact Support page --- */
+.contact-support-page {
+  min-height: 100vh;
+  background: linear-gradient(to right, #f9f7ff, #fff0e3);
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+  padding-top: 70px;
+  padding-bottom: 60px;
+}
+
+.support-hero-section {
+  text-align: center;
+  padding: 3rem 1.5rem 2rem 1.5rem;
+  max-width: 700px;
+  margin: 0 auto 2.5rem auto;
+}
+.support-hero-section h1 {
+  color: #5e4b8b;
+  font-weight: 800;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+.support-hero-section p {
+  color: #888;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.quick-help-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.quick-help-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+  padding: 1.2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  font-weight: 600;
+  color: #5e4b8b;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  min-width: 160px;
+  max-width: 200px;
+  flex: 1 1 160px;
+}
+.quick-help-card:hover {
+  box-shadow: 0 8px 32px rgba(124, 95, 240, 0.16);
+  transform: translateY(-4px) scale(1.01);
+}
+.quick-help-icon {
+  font-size: 2rem;
+  color: #7c5ff0 !important;
+  background: #f0e8ff;
+  border-radius: 12px;
+  padding: 0.5rem;
+}
+.quick-help-card:nth-child(3) .quick-help-icon {
+  background: #1ec28b;
+  color: #fff !important;
+}
+
+.contact-form-section {
+  display: flex;
+  justify-content: center;
+  margin: 2.5rem 0 2.5rem 0;
+}
+.contact-form-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(124, 95, 240, 0.08);
+  padding: 2.5rem 2rem;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+.contact-form-card h2 {
+  color: #7c5ff0;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+.form-row {
+  display: flex;
+  gap: 1.2rem;
+}
+.form-group label {
+  color: #5e4b8b;
+  font-weight: 600;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fafafa;
+  color: #5e4b8b;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #7c5ff0;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(124, 95, 240, 0.08);
+}
+.attachment-group label {
+  color: #7c5ff0;
+  font-weight: 600;
+}
+.attachment-name {
+  color: #5e4b8b;
+  font-size: 0.95rem;
+  margin-left: 0.5rem;
+}
+.form-error {
+  color: #FF6B6B;
+  background: #fff0f0;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin: 0.7rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.form-success {
+  color: #1ec28b;
+  background: #e6f9f3;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin: 0.7rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+.submit-btn {
+  background: #7c5ff0;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.submit-btn:disabled {
+  background: #d1c4e9;
+  color: #fff;
+  cursor: not-allowed;
+}
+.submit-btn:hover:not(:disabled) {
+  background: #5e4b8b;
+}
+.reset-btn {
+  background: #ff9f59;
+  color: #232323;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.reset-btn:hover {
+  background: #ffd6a0;
+}
+
+.contact-options-section {
+  margin: 2.5rem auto 2.5rem auto;
+  max-width: 1100px;
+}
+.contact-options-section h2 {
+  color: #5e4b8b;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.contact-options-grid {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.contact-option-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 220px;
+  max-width: 320px;
+  flex: 1 1 220px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.contact-option-card:hover {
+  box-shadow: 0 8px 32px rgba(124, 95, 240, 0.16);
+  transform: translateY(-4px) scale(1.01);
+}
+.option-icon {
+  font-size: 2rem;
+  color: #7c5ff0;
+  background: #f0e8ff;
+  border-radius: 12px;
+  padding: 0.5rem;
+}
+.contact-option-card:first-child .option-icon {
+  background: #1ec28b;
+  color: #fff;
+}
+.option-label {
+  color: #5e4b8b;
+  font-weight: 600;
+}
+.option-number {
+  color: #ff9f59;
+  font-weight: 700;
+}
+.option-btn {
+  background: #7c5ff0;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.contact-option-card:nth-child(2) .option-btn {
+  background: #ff9f59;
+  color: #232323;
+}
+.contact-option-card:nth-child(2) .option-btn:hover {
+  background: #ffd6a0;
+}
+.contact-option-card:nth-child(3) .option-btn {
+  background: #1ec28b;
+  color: #fff;
+}
+.contact-option-card .option-btn:hover {
+  background: #5e4b8b;
+  color: #fff;
+}
+
+.support-hours-section {
+  margin: 2.5rem auto 2.5rem auto;
+  max-width: 1100px;
+}
+.support-hours-section h2 {
+  color: #5e4b8b;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.support-hours-grid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.support-hours-block, .support-location-block {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 220px;
+  max-width: 320px;
+  flex: 1 1 220px;
+  color: #232323;
+}
+.support-hours-block *, .support-location-block * {
+  color: #232323 !important;
+}
+.option-label, .option-number {
+  color: #232323 !important;
+}
+.support-hours-icon, .support-location-icon {
+  font-size: 2rem;
+  color: #7c5ff0;
+  background: #f0e8ff;
+  border-radius: 12px;
+  padding: 0.5rem;
+}
+.ticket-lookup-section {
+  margin: 2.5rem auto 2.5rem auto;
+  max-width: 600px;
+}
+.ticket-lookup-section h2 {
+  color: #5e4b8b;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.ticket-lookup-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto 1rem auto;
+}
+.ticket-lookup-icon {
+  font-size: 1.5rem;
+  color: #7c5ff0;
+}
+.ticket-lookup-card input {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fafafa;
+  color: #5e4b8b;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.ticket-lookup-card input:focus {
+  outline: none;
+  border-color: #7c5ff0;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(124, 95, 240, 0.08);
+}
+.track-btn {
+  background: #7c5ff0;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.3rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.track-btn:hover {
+  background: #5e4b8b;
+}
+.ticket-feedback {
+  color: #1ec28b;
+  background: #e6f9f3;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin: 0.7rem auto 0 auto;
+  max-width: 400px;
+  text-align: center;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .contact-options-grid, .support-hours-grid {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+}
+@media (max-width: 900px) {
+  .quick-help-grid {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+  .contact-form-card {
+    padding: 1.5rem 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .support-hero-section {
+    padding: 1rem;
+  }
+  .contact-form-card {
+    padding: 1rem 0.5rem;
+  }
+  .contact-options-section, .support-hours-section, .ticket-lookup-section {
+    padding: 1rem 0.5rem;
+  }
+} 

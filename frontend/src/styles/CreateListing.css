@@ -1,0 +1,852 @@
+/* CreateListing.css */
+
+.create-listing-container {
+  min-height: 100vh;
+  background: linear-gradient(to right, #f9f7ff, #fff0e3);
+  padding-top: 70px;
+}
+
+/* Edit Page Header */
+.edit-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: #7c5ff0;
+  border: 2px solid #7c5ff0;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #7c5ff0;
+  color: white;
+}
+
+.edit-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #5e4b8b;
+  margin: 0;
+}
+
+/* Hero Banner */
+.hero-banner {
+  position: relative;
+  height: 400px;
+  background: linear-gradient(135deg, #2AB7CA 0%, #004E64 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  max-width: 600px;
+  padding: 0 2rem;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.hero-cta {
+  background: #FF9F59;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.hero-cta:hover {
+  background: #e88a4a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 159, 89, 0.4);
+}
+
+/* Form Container */
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.form-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+  transition: transform 0.3s ease;
+  border: 2px solid #f0e8ff;
+}
+
+.form-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(124, 95, 240, 0.12);
+}
+
+.form-section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #5e4b8b;
+  margin-bottom: 2rem;
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #5e4b8b;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  color: #000000;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #7c5ff0;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(124, 95, 240, 0.1);
+  color: #000000;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #6b7280;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Radio Buttons */
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Ensure the parent element for absolute positioning is set to relative */
+.radio-custom {
+    position: relative; /* THIS IS CRUCIAL! */
+    display: inline-block; /* Or block, depending on your layout */
+    width: 20px; /* Example: Define a size for your radio button visual */
+    height: 20px; /* Example: Define a size for your radio button visual */
+    border: 2px solid #ccc; /* Example: Border for the radio button circle */
+    border-radius: 50%; /* Makes it a circle */
+    background-color: #f0f0f0; /* Example background */
+    vertical-align: middle; /* Aligns with text if used inline */
+    cursor: pointer; /* Indicates it's clickable */
+}
+
+.radio-option input[type="radio"] {
+    /* Hide the default browser radio button */
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none; /* Prevents interaction with the hidden input */
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;    /* Position the top edge at the vertical center of the parent */
+    left: 50%;   /* Position the left edge at the horizontal center of the parent */
+    transform: translate(-50%, -50%); /* Shift it back by half its own size to perfectly center */
+    width: 8px; /* Size of the inner circle */
+    height: 8px; /* Size of the inner circle */
+    background: #7c5ff0; /* Example: Color of the inner circle when checked (use your purple color) */
+    border-radius: 50%; /* Makes the inner dot a circle */
+    /* Add a subtle transition for a smoother check animation */
+    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Optional: Style for when the radio button is checked (e.g., change border color) */
+.radio-option input[type="radio"]:checked + .radio-custom {
+    border-color: #7c5ff0; /* Example: Change border color when checked */
+    background-color: #e0d9fc; /* Example: Light background when checked */
+}
+
+/* Example styling for the label to go with the radio button */
+.radio-option {
+    display: flex; /* Use flex to align the custom radio and text */
+    align-items: center; /* Vertically center them */
+    gap: 8px; /* Space between the custom radio and the text */
+    margin-bottom: 10px; /* Space between radio options */
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+  border-color: #7c5ff0;
+  background: #7c5ff0;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* <-- This is the main culprit */
+    left: 100%; /* <-- This is also contributing */
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Section Header with Divider */
+.section-header {
+  margin-bottom: 2rem;
+}
+
+.section-divider {
+  height: 3px;
+  background: linear-gradient(90deg, #7c5ff0, #9f8fff);
+  border-radius: 2px;
+  margin-top: 0.5rem;
+}
+
+/* Amenities Grid */
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.amenity-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.amenity-checkbox:hover {
+  border-color: #7c5ff0;
+  background: #f9f7ff;
+}
+
+.amenity-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  color: #5e4b8b;
+  font-weight: 500;
+}
+
+.checkbox-custom svg {
+  font-size: 1.2rem;
+  color: #7c5ff0;
+}
+
+.amenity-checkbox input[type="checkbox"]:checked + .checkbox-custom {
+  color: #7c5ff0;
+}
+
+.amenity-checkbox input[type="checkbox"]:checked + .checkbox-custom::before {
+  content: '✓';
+  position: absolute;
+  right: 1rem;
+  color: #7c5ff0;
+  font-weight: bold;
+}
+
+.amenity-checkbox input[type="checkbox"]:checked {
+  border-color: #7c5ff0;
+  background: #f9f7ff;
+}
+
+.amenity-name {
+  font-weight: 500;
+}
+
+/* Upload Area */
+.upload-area {
+  margin-top: 1rem;
+}
+
+.upload-box {
+  border: 2px dashed #7c5ff0;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  background: #f9f7ff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.upload-box:hover {
+  border-color: #6b46c1;
+  background: #f0e8ff;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #7c5ff0;
+  margin-bottom: 1rem;
+}
+
+.upload-box h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #5e4b8b;
+  margin-bottom: 0.5rem;
+}
+
+.upload-box p {
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.upload-hint {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 1.5rem;
+}
+
+.upload-btn {
+  background: #7c5ff0;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+  background: #6b46c1;
+  transform: translateY(-2px);
+}
+
+/* Submit Section */
+.submit-section {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(124, 95, 240, 0.08);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #7c5ff0 0%, #9f8fff 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.submit-btn:hover {
+  background: linear-gradient(135deg, #6b46c1 0%, #8b7fd6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(124, 95, 240, 0.4);
+}
+
+.submit-hint {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .form-container {
+    padding: 2rem 1rem;
+  }
+  
+  .form-section {
+    padding: 1.5rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .radio-group {
+    flex-direction: column;
+  }
+  
+  .amenities-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .upload-box {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-banner {
+    height: 300px;
+  }
+  
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .upload-box {
+    padding: 1.5rem 1rem;
+  }
+} 
+
+/* Add this to your CreateListing.css */
+
+.file-upload-summary {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.file-upload-summary p {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.file-upload-summary ul {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+    max-height: 150px; /* Limit height to prevent excessive scrolling */
+    overflow-y: auto; /* Enable scrolling if too many files */
+}
+
+.file-upload-summary li {
+    background-color: #fff;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.file-upload-summary li:last-child {
+    border-bottom: none;
+}
+/* Room Configurations Section */
+.room-config-adder {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.room-input-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    align-items: flex-end; /* Aligns items at the bottom */
+}
+
+.add-room-btn {
+    background: linear-gradient(135deg, #7c5ff0, #9f8fff);; /* Green color for add button */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem; /* Space from the inputs */
+}
+
+.add-room-btn:hover {
+    background: linear-gradient(135deg, #7f65e8, #9f8fff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 184, 92, 0.3);
+}
+
+/* Added Room Types Table */
+.added-room-types {
+    margin-top: 2rem;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.added-room-types h3 {
+    font-size: 1.4rem;
+    color: #5e4b8b;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    border-bottom: 2px solid #f0e8ff;
+    padding-bottom: 0.8rem;
+}
+
+.room-details-table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-collapse: collapse; /* For a table-like appearance with flex */
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1.2fr 0.5fr; /* Adjust column widths as needed */
+    padding: 0.8rem 1rem;
+    align-items: center;
+    text-align: left;
+}
+
+.table-header {
+    background-color: #f0e8ff;
+    font-weight: 700;
+    color: #5e4b8b;
+    border-bottom: 2px solid #7c5ff0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.table-row {
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.table-row span {
+    padding: 0.2rem 0;
+}
+
+.remove-room-btn {
+    background: #dc3545; /* Red color for remove button */
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.remove-room-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.remove-room-btn svg {
+    margin: 0; /* Remove default margin for icon */
+}
+
+/* Responsive adjustments for room details table */
+@media (max-width: 768px) {
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr 1fr 1fr 1fr; /* Adjust columns for smaller screens */
+        gap: 0.5rem;
+    }
+    .table-header span:nth-child(5), /* Hide Actions column header on smaller screens */
+    .table-row span:nth-child(5) { /* Hide Actions column content on smaller screens */
+        display: none;
+    }
+    .table-row .remove-room-btn {
+        margin-left: auto; /* Push button to the right */
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .room-input-grid {
+        grid-template-columns: 1fr; /* Stack room input fields */
+    }
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr 1fr; /* Even fewer columns, potentially stacking */
+    }
+    .table-header span:nth-child(3),
+    .table-header span:nth-child(4),
+    .table-row span:nth-child(3),
+    .table-row span:nth-child(4) {
+        display: none; /* Hide more columns if necessary */
+    }
+    .added-room-types h3 {
+        text-align: center;
+    }
+}
+.room-input-grid {
+    /* Change this line */
+    grid-template-columns: 1fr 1fr; /* This will create two equal columns */
+    /* Or, if you want specific widths, e.g., two 200px columns: */
+    /* grid-template-columns: 200px 200px; */
+
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+/* Add or modify this media query for smaller screens if needed */
+@media (max-width: 768px) { /* Adjust breakpoint as necessary */
+    .room-input-grid {
+        grid-template-columns: 1fr; /* Revert to single column on smaller screens */
+    }
+}
+
+/* In CreateListing.css */
+
+/* ... (other existing CSS) ... */
+
+.room-input-grid {
+    grid-template-columns: 1fr 1fr; /* FOR 2 COLUMNS */
+    gap: 1.5rem; /* Adjust gap as needed for spacing */
+    align-items: flex-start; /* Align fields to the top */
+}
+
+.add-room-btn {
+    background: #7c5ff0; /* Purple color from your image */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px; /* Slightly less rounded than 50px */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex; /* Use flex for internal icon/text alignment */
+    align-items: center;
+    justify-content: center; /* Center the icon and text */
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    width: fit-content; /* Make button width fit its content */
+    margin-left: auto; /* Center the button horizontally */
+    margin-right: auto; /* Center the button horizontally */
+}
+
+.add-room-btn:hover {
+    background: #6b46c1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 95, 240, 0.3);
+}
+
+/* Responsive adjustment for room input grid */
+@media (max-width: 768px) {
+    .room-input-grid {
+        grid-template-columns: 1fr; /* Stack inputs on small screens */
+    }
+    .add-room-btn {
+        width: 100%; /* Make button full width on small screens if desired */
+    }
+}
+
+
+/* ... (rest of your CSS) ... */
+/* --- Existing Photos Styling --- */
+
+.existing-photos-summary {
+    margin-top: 20px;
+    background-color: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.existing-photos-summary p {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.existing-photo-grid {
+    display: grid;
+    /* This creates a responsive grid. Adjust minmax(100px, 1fr) to control image size */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px; /* Space between images */
+    padding: 5px;
+    max-height: 250px; /* Limit the height of the grid container */
+    overflow-y: auto; /* Add scroll if content exceeds max-height */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.existing-photo-item {
+    position: relative;
+    width: 100%; /* Ensure item takes full grid cell width */
+    padding-top: 75%; /* 4:3 aspect ratio (75% of width) for consistent image height */
+    overflow: hidden; /* Hide anything outside the padded area */
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.existing-photo-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This is key: crops the image to fit without distortion */
+    border-radius: 4px;
+}
+
+.remove-existing-photo-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7); /* Red with some transparency */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make it a circle */
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10; /* Ensure it's above the image */
+    transition: background-color 0.2s ease;
+}
+
+.remove-existing-photo-btn:hover {
+    background-color: rgba(255, 0, 0, 1);
+    transform: scale(1.1);
+}
+
+/* Optional: Scrollbar styling for existing-photo-grid */
+.existing-photo-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.existing-photo-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.existing-photo-grid::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.existing-photo-grid::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+

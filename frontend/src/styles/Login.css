@@ -1,0 +1,282 @@
+/* Import matching fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #f9f7ff, #fff0e3);
+}
+
+.login-page {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 4rem 4rem !important;
+  min-height: 100vh !important;
+  background-color: #472b82 !important;
+  background-image: url('../../public/login-image.jpg') !important;
+  background-size: auto 80% !important;  /* Scales image height */
+  background-position: left center !important; /* Shift to left */
+  background-repeat: no-repeat !important;
+  position: relative !important;
+}
+
+
+
+.login-page > * {
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: 2rem !important;
+}
+
+.logo-section {
+  margin-bottom: 0.1rem;
+  text-align: center;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #5e4b8b;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #7c5ff0, #ff9f59);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  margin: 2.5rem auto 0 auto;
+  display: block;
+}
+
+.logo-section a {
+  text-decoration: none;
+}
+
+.login-container {
+  background: #ffffff;
+  padding: 1.2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(124, 95, 240, 0.12);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-left: auto !important;
+  margin-right: 1rem !important;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #7c5ff0, #ff9f59);
+  border-radius: 24px 24px 0 0;
+}
+
+.header-content {
+  margin-bottom: 0.2rem;
+}
+
+.header-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #5e4b8b;
+  margin-bottom: 0.1rem;
+}
+
+.header-content p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 0.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #5e4b8b;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  color: #5e4b8b;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #7c5ff0;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(124, 95, 240, 0.1);
+}
+
+.form-group input.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 0.8rem;
+}
+
+.forgot-password a {
+  color: #7c5ff0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+  color: #5e4b8b;
+  text-decoration: underline;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #7c5ff0, #9f8fff);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(124, 95, 240, 0.3);
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.signup-text {
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.signup-text a {
+  color: #ff9f59;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .login-page {
+    padding: 2rem;
+    align-items: center;
+  }
+  .login-container {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+  .logo {
+    font-size: 2rem;
+  }
+  .header-content h2 {
+    font-size: 1.75rem;
+  }
+  .header-content p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1.5rem 1rem;
+  }
+  .logo {
+    font-size: 1.75rem;
+  }
+  .header-content h2 {
+    font-size: 1.5rem;
+  }
+  .login-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+
+/* --- Notification Styles (Add/Verify these in Login.css) --- */
+.notification {
+    position: fixed; /* Makes it float above other content */
+    top: 20px;       /* Distance from the top of the viewport */
+    left: 50%;       /* Centers horizontally */
+    transform: translateX(-50%); /* Ensures perfect centering regardless of width */
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: #000000;
+    font-weight: bold;
+    z-index: 1000;   /* CRITICAL: Ensures it appears on top of other elements */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    min-width: 250px;
+    text-align: center;
+    /* The animation will handle fade in/out if you keep it */
+    animation: fadeInOut 3s forwards;
+    /* Ensure no conflicting styles like display: none or opacity: 0 */
+}
+
+.notification.success {
+    background-color: #4CAF50; /* Green for success */
+}
+
+.notification.error {
+  color: #000000;
+    background-color: #f44336; /* Red for error */
+}
+
+/* Keyframe animation for fade in/out */
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(0); } /* Holds visible */
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}

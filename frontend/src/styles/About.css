@@ -1,0 +1,115 @@
+.about-container {
+  padding: 4rem 2rem;
+  background: linear-gradient(to right, #5e4b8b, #7c5ff0); /* Dark purple gradient */
+  text-align: center;
+  width: 100%; /* Take full width */
+  margin: 0; /* Remove margin so it stretches */
+  border-radius: 0; /* Remove rounded corners if needed */
+}
+
+.about-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #ffffff; /* White heading on dark background */
+}
+
+.about-heading span {
+  color: #ff9f59; /* Accent orange stays */
+}
+
+.about-subtext {
+  color: #ddd; /* Light gray for readability */
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.steps-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.step-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  width: 250px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-5px);
+}
+
+.step-number {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  background: #ff9f59; /* Orange bubble */
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon {
+  font-size: 2rem;
+  background: #7c5ff0; /* Purple icon background */
+  color: white;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.step-icon.yellow {
+  background: #ffb347;
+}
+
+.step-card h3 {
+  font-size: 1.1rem;
+  margin: 0.8rem 0 0.5rem;
+  color: #2c2c2c;
+}
+
+.step-card p {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.about-cta-text {
+  font-size: 1rem;
+  margin-top: 2rem;
+  color: #eee;
+}
+
+.start-search-btn {
+  background-color: #ff9f59;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 999px;
+  font-weight: bold;
+  margin-top: 1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255, 159, 89, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.start-search-btn:hover {
+  transform: translateY(-3px);
+}
+

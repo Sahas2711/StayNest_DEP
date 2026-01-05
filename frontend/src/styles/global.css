@@ -1,0 +1,152 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #a66db6 0%, #f2def3 100%);
+  scroll-behavior: smooth;
+  color: #f0f0f0;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container for page content */
+.container {
+  max-width: 1200px;
+  width: 90%;
+  margin: 2rem auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+/* Paragraphs */
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #ddd;
+}
+
+/* Links */
+a {
+  color: #a78bfa; /* soft purple */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: #fff;
+}
+
+/* Buttons */
+button {
+  background-color: #764ba2;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(118, 75, 162, 0.4);
+}
+button:hover {
+  background-color: #5a3580;
+  box-shadow: 0 6px 14px rgba(90, 53, 128, 0.6);
+}
+
+/* Inputs and textareas */
+
+input[type="password"],
+select {
+  width: 100%;
+  padding: 0.7rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background-color: #ffffff;
+  color: #eee;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #764ba2;
+  outline: none;
+}
+
+/* Form labels */
+label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: #ddd;
+}
+
+/* Responsive grid example */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Scrollbar style for better look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #333;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #764ba2;
+  border-radius: 10px;
+}
+
+/* Additional custom styles can go here */

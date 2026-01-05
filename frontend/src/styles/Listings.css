@@ -1,0 +1,497 @@
+/* src/pages/Listings.css */
+
+.browsepgs-container {
+  padding: 2rem;
+  background: linear-gradient(to right, #f3e5f5, #fff8f9); /* light lavender to soft pink */
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  min-height: 100vh;
+  margin-top: 0;
+  position: relative;
+}
+
+.search-section {
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 5;
+  padding-top: 1rem;
+}
+
+.search-title {
+  text-align: center;
+  color: #4a0072;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.browsepgs-container h1 {
+  font-size: 2rem;
+  color: #4a0072;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.browsepgs-container p {
+  color: #555;
+}
+
+.pg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.pg-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 2px solid #f3c1da;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.pg-card:hover {
+  transform: translateY(-5px);
+}
+
+.pg-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.tag {
+  background: #e0e0e0;
+  color: #333;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tag.verified {
+  background: #4caf50;
+  color: #fff;
+}
+
+.tag[class*="top-rated"] {
+  background: #ff9800;
+  color: #fff;
+}
+
+.tag[class*="new"] {
+  background: #03a9f4;
+  color: #fff;
+}
+
+.tag[class*="budget-friendly"] {
+  background: #2196f3;
+  color: #fff;
+}
+
+.tag[class*="premium"] {
+  background: #f44336;
+  color: #fff;
+}
+
+.pg-card h2 {
+  color: #4a0072;
+  font-size: 1.2rem;
+  margin: 0.3rem 0;
+}
+
+.location,
+.rating,
+.price,
+.availability {
+  font-size: 0.9rem;
+  margin: 0.2rem 0;
+}
+
+.details-btn {
+  margin-top: auto;
+  background: #ba68c8;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.details-btn:hover {
+  background: #9c27b0;
+}
+
+.browsepgs-container .tenant-search-bar {
+  border: 2.5px solid orange !important;
+}
+
+/* src/styles/Listings.css */
+
+/* General PG Card Styling (adjust if needed) */
+.pg-card {
+  background-color: #fff;
+  border-radius: 12px; /* Soften corners */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+  overflow: hidden; /* Crucial to contain the image corners */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-bottom: 1rem; /* Add some padding at the bottom for content */
+  transition: transform 0.2s ease-in-out;
+}
+
+.pg-card:hover {
+  transform: translateY(-5px); /* Lift card on hover */
+}
+
+/* Image Container */
+.pg-card-image-container {
+  width: 100%; /* Take full width of the card */
+  height: 200px; /* Fixed height for consistency, adjust as needed */
+  overflow: hidden; /* Hide any overflow if image is larger */
+  border-top-left-radius: 12px; /* Match card border radius */
+  border-top-right-radius: 12px; /* Match card border radius */
+  margin-bottom: 1rem; /* Space between image and text content */
+}
+
+.pg-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This is key! It covers the container without distorting the image */
+  display: block; /* Remove extra space below image */
+}
+
+/* Adjustments for existing elements to accommodate the image */
+.pg-tags {
+  position: absolute; /* Position tags over the image */
+  top: 10px;
+  left: 10px;
+  z-index: 10; /* Ensure tags are above the image */
+  display: flex;
+  flex-wrap: wrap; /* Allow tags to wrap if many */
+  gap: 5px;
+}
+
+/* General spacing for content below the image */
+.pg-card h2,
+.pg-card .location,
+.pg-card .rating,
+.pg-card .price,
+.pg-card p,
+.pg-card .availability {
+  padding-left: 1rem; /* Add horizontal padding to card content */
+  padding-right: 1rem;
+}
+
+.pg-card h2 {
+    margin-top: 0.5rem; /* Adjust space after image container */
+    margin-bottom: 0.5rem;
+    font-size: 1.4em;
+    color: #333;
+}
+
+.pg-card p {
+    margin-bottom: 0.3em;
+    color: #666;
+    font-size: 0.95em;
+}
+
+
+
+
+/* Responsive adjustments for pg-grid */
+@media (max-width: 992px) {
+  .pg-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .pg-grid {
+    grid-template-columns: 1fr; /* Single column on small screens */
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+/* ... existing styles ... */
+
+/* Find the .pg-card selector and add the following style to ensure buttons are at the bottom */
+.pg-card {
+  /* ... existing styles ... */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Add this line */
+}
+
+/* ... existing styles ... */
+/* Add this section for the new Pagination component */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.pagination-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 1rem;
+    color: #4a0072;
+    font-weight: 600;
+    margin: 0 0.2rem;
+}
+
+.pagination-button:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.pagination-button.active {
+    background-color: #ba68c8;
+    color: #fff;
+    border-color: #ba68c8;
+    transform: scale(1.05);
+}
+
+.browsepgs-container {
+    padding: 2rem;
+    background: linear-gradient(to right, #f3e5f5, #fff8f9);
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    min-height: 100vh;
+    margin-top: 0;
+    position: relative;
+}
+
+.search-section {
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 5;
+    padding-top: 1rem;
+}
+
+.search-title {
+    text-align: center;
+    color: #4a0072;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.browsepgs-container h1 {
+    font-size: 2rem;
+    color: #4a0072;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.browsepgs-container p {
+    color: #555;
+}
+
+.pg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.pg-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 2px solid #f3c1da;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.pg-card:hover {
+    transform: translateY(-5px);
+}
+
+.pg-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1rem;
+}
+
+.tag {
+    background: #e0e0e0;
+    color: #333;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tag.verified {
+    background: #4caf50;
+    color: #fff;
+}
+
+.tag[class*="top-rated"] {
+    background: #ff9800;
+    color: #fff;
+}
+
+.tag[class*="new"] {
+    background: #03a9f4;
+    color: #fff;
+}
+
+.tag[class*="budget-friendly"] {
+    background: #2196f3;
+    color: #fff;
+}
+
+.tag[class*="premium"] {
+    background: #f44336;
+    color: #fff;
+}
+
+.pg-card h2 {
+    color: #4a0072;
+    font-size: 1.2rem;
+    margin: 0.3rem 0;
+}
+
+.location,
+.rating,
+.price,
+.availability {
+    font-size: 0.9rem;
+    margin: 0.2rem 0;
+}
+
+.details-btn {
+    margin-top: auto;
+    background: #ba68c8;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.details-btn:hover {
+    background: #9c27b0;
+}
+
+.browsepgs-container .tenant-search-bar {
+    border: 2.5px solid orange !important;
+}
+
+.pg-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.2s ease-in-out;
+}
+
+.pg-card:hover {
+    transform: translateY(-5px);
+}
+
+.pg-card-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.pg-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.pg-card-content {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.pg-tags {
+    position: static;
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0;
+    margin-top: 1rem;
+}
+
+.pg-card-actions {
+    padding: 1rem;
+    padding-top: 0;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.pg-card h2,
+.pg-card .location,
+.pg-card .rating,
+.pg-card .price,
+.pg-card p,
+.pg-card .availability {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.pg-card h2 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.4em;
+    color: #333;
+}
+
+.pg-card p {
+    margin-bottom: 0.3em;
+    color: #666;
+    font-size: 0.95em;
+}
+
+@media (max-width: 992px) {
+    .pg-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pg-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+}
+

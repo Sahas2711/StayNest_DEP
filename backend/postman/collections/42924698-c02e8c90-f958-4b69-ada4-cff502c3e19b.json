@@ -1,0 +1,1087 @@
+{
+	"info": {
+		"_postman_id": "42924698-c02e8c90-f958-4b69-ada4-cff502c3e19b",
+		"name": "StayNest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register",
+					"id": "42924698-9f6efa34-780d-4e80-9c78-b86cd90eba4a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"email\": \"user13@gmail.com\",\r\n        \"password\": \"Pass\",\r\n        \"name\": \"user13\",\r\n        \"role\": \"STUDENT\",\r\n        \"phoneNumber\": \"1234567890\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"id": "42924698-7f7588b8-99ae-490f-a8f0-3234eb5c155e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"email\": \"user13@gmail.com\",\r\n        \"password\": \"Pass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All User",
+					"id": "42924698-32169646-118b-4f78-af08-7ad11154b2c3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "jwt",
+							"jwt": [
+								{
+									"key": "secret",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "isSecretBase64Encoded",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "algorithm",
+									"value": "HS256",
+									"type": "string"
+								},
+								{
+									"key": "payload",
+									"value": "{}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "queryParamKey",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "header",
+									"value": "{}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8086/getusers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"getusers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Current User",
+					"id": "42924698-ca009274-83ca-4765-b55e-4fa20854c453",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/users/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"id": "42924698-9ae40df8-05d4-4301-a496-1669242c4a5b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"email\": \"abc@gmail.com\",\r\n    \"password\": \"Pass\",\r\n    \"name\": \"abc\",\r\n    \"role\": \"Student\",\r\n    \"phoneNumber\": \"13\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/users/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"users",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete My Account",
+					"id": "42924698-63cdba3c-91a6-471d-abe4-f9b70db8a88a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"id\": 8\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/users/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"users",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User By id",
+					"id": "42924698-da5ed730-802f-4cf2-be4c-e0541703d4e7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMTNAZ21haWwuY29tIiwiaWF0IjoxNzUxOTUxNTUyLCJleHAiOjE3NTE5Njk1NTJ9.iHAegraVCTypbRFjF1Uy0yejofeRwDfI1eVE0jEJHpvLUb-ClQmfn2S7lblErcvOyQL9M5mQJG16aE3Rcl1v-w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"id\":\"13\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/users/id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"users",
+								"id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users by role",
+					"id": "42924698-7e2de792-ade1-4e69-8fc5-28fe2234859d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/users/role?role=student",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"users",
+								"role"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "student"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "42924698-f6e34211-a538-44ff-a263-e28c3b77bd5b"
+		},
+		{
+			"name": "Owner",
+			"item": [
+				{
+					"name": "Register",
+					"id": "42924698-89706f2d-a843-4e1a-ac93-b88f2591a201",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"owner1@gmail.com\",\r\n    \"password\": \"Pass@123456\",\r\n    \"name\": \"owner\",\r\n    \"phoneNumber\": \"1234567890\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/owner/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"id": "42924698-25180e3a-0cb0-4861-9e85-f72b6a89d7ef",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"owner4@gmail.com\",\r\n        \"password\": \"Pass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/owner/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Owners",
+					"id": "42924698-b7013897-5095-4aa3-9142-38407288645e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/owner/getusers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"getusers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Current Owner",
+					"id": "42924698-cdeccc07-a0b8-45d1-9a4c-be1ddcd4d19b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"email\": \"owner1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/owner/users/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Owner",
+					"id": "42924698-5cfe69f4-74e9-4f53-86c5-ed8e9dc6c486",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"email\": \"abc@gmail.com\",\r\n    \"password\": \"Pass\",\r\n    \"name\": \"abc\",\r\n    \"role\": \"TENANT\",\r\n    \"phoneNumber\": \"13\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/owner/users/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"users",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete My Account",
+					"id": "42924698-14298aa6-2a3e-436c-a211-07198e7af0a6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"id\": 7,\r\n        \"email\": \"user1@gmail.com\",\r\n        \"password\": \"Pass\",\r\n        \"name\": \"user1\",\r\n        \"role\": \"Tenant\",\r\n        \"phoneNumber\": \"1234567890\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/owner/users/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"users",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Owner By id",
+					"id": "42924698-0fc61d96-0fef-4cb9-b3ff-8c39f14b77b0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8086/owner/users/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"owner",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "42924698-38fde86c-abe5-4cff-a0a1-e906643e3d3d"
+		},
+		{
+			"name": "Listing",
+			"item": [
+				{
+					"name": "Create Listing",
+					"id": "42924698-e67cfa10-7a36-44d2-85f0-5b54aca91313",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"id\":\"1\",\r\n        \r\n        \"owner\": {\r\n            \"id\": 3,\r\n            \"email\": \"abc1@gmail.com\",\r\n            \"password\": \"Pass\",\r\n            \"name\": \"abc\",\r\n            \"role\": \"OWNER\",\r\n            \"phoneNumber\": \"1234567890\"\r\n        },\r\n        \"title\": \"Premium PG for Student\",\r\n        \"address\": \"Katraj Pune\",\r\n        \"rent\": 10100.0\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/listing/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"listing",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Listings",
+					"id": "42924698-285e8c68-7520-4f0f-a3bd-75fe707fcfd6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8086/listing/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"listing",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Listing",
+					"id": "42924698-07352493-e6ec-43c6-b33b-80818871885f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMTNAZ21haWwuY29tIiwiaWF0IjoxNzUxOTUxNTUyLCJleHAiOjE3NTE5Njk1NTJ9.iHAegraVCTypbRFjF1Uy0yejofeRwDfI1eVE0jEJHpvLUb-ClQmfn2S7lblErcvOyQL9M5mQJG16aE3Rcl1v-w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"id\": 1,\r\n        \"owner\": {\r\n            \"id\": 3\r\n        },\r\n        \"title\": \"Premium PG \",\r\n        \"address\": \"Pune\",\r\n        \"rent\": 11100.0\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/listing/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"listing",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Listing",
+					"id": "42924698-52341f07-4d13-4b68-82ac-b91f7ebcab59",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"id\": 0,\r\n        \"owner\": {\r\n            \"id\": 3,\r\n            \"email\": \"abc1@gmail.com\",\r\n            \"password\": \"Pass\",\r\n            \"name\": \"abc\",\r\n            \"role\": \"OWNER\",\r\n            \"phoneNumber\": \"13\"\r\n        },\r\n        \"title\": \"Premium PG for Working Professionals\",\r\n        \"address\": \"Pune\",\r\n        \"rent\": 10100.0\r\n    }"
+						},
+						"url": {
+							"raw": "http://localhost:8086/listing/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"listing",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search By address",
+					"id": "42924698-f5217b90-455e-47ab-a779-b1c22223e99c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8086/listing/search/pune",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"listing",
+								"search",
+								"pune"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listing By Id",
+					"id": "42924698-6bfb9148-2eb8-4fae-9218-1102f67d1714",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/listing/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"listing",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "42924698-e0221c12-f15e-455f-8f8c-738e9989efa1"
+		},
+		{
+			"name": "Booking",
+			"item": [
+				{
+					"name": "Book a listing",
+					"id": "42924698-e4813a20-0db0-488c-a355-8b3caf089240",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 1003,\r\n  \"tenant\": {\r\n    \"id\": 1\r\n  },\r\n  \"listing\": {\r\n    \"id\": 1\r\n  },\r\n  \"startDate\": \"2025-07-05\",\r\n  \"endDate\": \"2025-07-12\",\r\n  \"status\": \"NOT BOOKED\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/bookings",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"id": "42924698-5ba3f1e8-e89d-4f66-90bd-5675b0a3d1d9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 1002,\r\n  \"tenant\": {\r\n    \"id\": 1\r\n  },\r\n  \"listing\": {\r\n    \"id\": 1\r\n  },\r\n  \"startDate\": \"2025-07-05\",\r\n  \"endDate\": \"2025-07-12\",\r\n  \"status\": \"NOT BOOKED\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/bookings/1002/cancel",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"bookings",
+								"1002",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Booking detail by id",
+					"id": "42924698-bff4465c-7304-413e-b5b7-129b1c67c7ce",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/api/bookings/1002",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"bookings",
+								"1002"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Booking by Status",
+					"id": "42924698-c9089b44-0a52-42cb-8baa-a567d46cdb03",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "View My booking",
+					"id": "42924698-6aa049a7-c968-4097-a40d-582768a319e1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/api/bookings/user/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"bookings",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VIew by Listing",
+					"id": "42924698-f4df10bc-0abd-4bc7-9133-eda7a1aa1417",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/api/bookings/listing/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"bookings",
+								"listing",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "42924698-d84dc4ae-3e18-472c-9776-0f21cc4d7299"
+		},
+		{
+			"name": "Review",
+			"item": [
+				{
+					"name": "Write Review",
+					"id": "42924698-1fbbf322-a194-4ad6-8f3a-3ac91f24cc80",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 3,\r\n  \"tenant\": { \"id\": 3 },\r\n  \"listing\": { \"id\": 2 },\r\n  \"rating\": 5,\r\n  \"feedback\": \"More than expected\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/review/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"review",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Review by Id",
+					"id": "42924698-73422423-5e15-473a-9cfe-95c6fa182123",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/review//{3}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"review",
+								"",
+								"{3}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Review",
+					"id": "42924698-28e66ecd-705c-44aa-a2b3-b2eadadc6b43",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/review/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"review",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Review",
+					"id": "42924698-e59d2cb5-b747-4d23-9f81-28568a5c09bf",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 3,\r\n  \"tenant\": { \"id\":  3},\r\n  \"listing\": { \"id\": 2 },\r\n  \"rating\": 4,\r\n  \"feedback\": \"Updated feedback\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/review/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"review",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By id",
+					"id": "42924698-99a82406-ca78-4d1e-a769-4e4e83b699d4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/review/delete/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"review",
+								"delete",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Review By Listing",
+					"id": "42924698-aa6accc4-7340-465b-8a41-993e37fa93b2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Review By tenant",
+					"id": "42924698-e5c104e4-7d89-414c-8835-ef6671e71f8f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8086/review/tenant/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"review",
+								"tenant",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "42924698-9e929ad5-3fb2-4f56-abe3-19d4476a441d"
+		}
+	]
+}

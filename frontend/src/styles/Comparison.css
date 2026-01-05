@@ -1,0 +1,236 @@
+.pg-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.details-btn {
+  background: #ba68c8;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.details-btn:hover {
+  background: #9c27b0;
+}
+
+.compare-btn {
+  background: orange;
+  color: #fff;
+  border: 2px solid #ccc;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.compare-btn:hover {
+  background: orange;
+  border-color: #999;
+}
+
+.compare-btn.selected {
+  background: red;
+  color: #fff;
+  border-color: #e60000;
+}
+
+.compare-btn.selected:hover {
+  background: #ff0000;
+  border-color: #ff4603;
+}
+
+.pg-card.selected-for-comparison {
+  border: 2px solid #764BC1;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+}
+
+.floating-compare-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #4a0072;
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  transition: transform 0.2s ease-in-out;
+}
+
+.floating-compare-button:hover {
+  background-color: #6a1b9a;
+  transform: translateY(-2px);
+}
+
+.comparison-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.comparison-modal-content {
+  background-color: rgb(255, 255, 255);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90%;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #4a0072;
+}
+
+.comparison-modal-content h2 {
+  text-align: center;
+  color: #4a0072;
+  margin-bottom: 1.5rem;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.comparison-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  
+    height: 576.6px;
+
+}
+
+.comparison-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.comparison-card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  color: #764BC1;
+}
+
+.comparison-card-body h3 {
+  color: #4a0072;
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.comparison-card-body p {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+/* 🧩 Step 3: New style for the "Remove" button inside the modal */
+.remove-from-compare-btn {
+  background-color: #e74c3c;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: auto; /* Pushes the button to the bottom */
+  align-self: flex-start;
+  transition: background-color 0.2s ease;
+}
+
+.remove-from-compare-btn:hover {
+  background-color: #c0392b;
+}
+/* ... other existing styles in Comparison.css ... */
+
+.comparison-card-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.comparison-card-body h3 {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+.comparison-card-body p {
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+    color:#764BC1;
+}
+
+/* This is the key change: Add a more specific selector for the pg-tags inside the comparison modal. */
+.comparison-card-body .pg-tags {
+    /* Override the absolute positioning from Listings.css */
+    position: static;
+    /* Ensure it's part of the normal flow */
+    margin-top: 0.5rem; /* Add some space above the tags */
+    margin-bottom: 0.5rem; /* Add some space below the tags */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+/* Ensure the tags themselves are also styled correctly inside the modal */
+.comparison-card-body .tag {
+    background: #e0e0e0;
+    color: #333;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* New style for the "Remove" button */
+.remove-from-compare-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: auto;
+    align-self: flex-start;
+    transition: background-color 0.2s ease;
+}
+
+.remove-from-compare-btn:hover {
+    background-color: #c0392b;
+}
+
+/* ... other existing styles in Comparison.css ... */
