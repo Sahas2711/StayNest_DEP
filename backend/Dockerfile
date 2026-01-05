@@ -1,16 +1,28 @@
-# Stage 1: Build the Spring Boot JAR
+# ===============================
+# Stage 1: Build the application
+# ===============================
 FROM maven:3.9.5-eclipse-temurin-17 AS build
+
 WORKDIR /app
+
+# Copy everything
 COPY . .
-RUN mvn clean package -DskipTests
 
-# Stage 2: Run the JAR
+# Use Maven Wrapper (important for consistency)
+RUN ./mvnw clean package -DskipTests
+
+# ===============================
+# Stage 2: Run the application
+# ===============================
 FROM eclipse-temurin:17-jdk-jammy
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
 
-# Expose port 8080 (Render expects this)
+WORKDIR /app
+
+# Copy only the built JAR
+COPY --from=build /app/target/StayNest-0.0.1-SNAPSHOT.jar app.jar
+
+# Render injects PORT dynamically
 EXPOSE 8080
 
-# Default command to run the application
+# Run Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
