@@ -102,7 +102,7 @@ const BookPG = () => {
   useEffect(() => {
     const fetchPGData = async () => {
       try {
-        const res = await axios.get(`http://localhost:8086/listing/${id}`);
+        const res = await axios.get(`https://staynest-backend-dymh.onrender.com/listing/${id}`);
         const data = res.data;
         console.log('Fetched PG Data:', data);
 

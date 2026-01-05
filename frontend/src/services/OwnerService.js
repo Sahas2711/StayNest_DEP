@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8086/owner'; // change if hosted elsewhere
+const API_BASE_URL = 'https://staynest-backend-dymh.onrender.com/owner'; // change if hosted elsewhere
 
 // Get JWT from localStorage or cookie
 const getToken = () => {
