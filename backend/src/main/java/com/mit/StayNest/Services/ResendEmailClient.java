@@ -16,7 +16,7 @@ public class ResendEmailClient {
 
     private final WebClient webClient;
 
-    @Value("${resend.from-email}")
+    @Value("${resend.from.email}")
     private String fromEmail;
 
     public ResendEmailClient(WebClient resendWebClient) {
