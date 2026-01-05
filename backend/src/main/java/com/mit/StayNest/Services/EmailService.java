@@ -20,26 +20,20 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class EmailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+   private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final ResendEmailClient resendEmailClient;
 
-    // Method to send a generic email
+    public EmailService(ResendEmailClient resendEmailClient) {
+        this.resendEmailClient = resendEmailClient;
+    }
+
     public void sendEmail(String to, String subject, String htmlContent) {
         try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true); // true indicates HTML content
-
-            javaMailSender.send(message);
-            logger.info("Email sent successfully to: {}", to);
+            resendEmailClient.sendHtmlEmail(to, subject, htmlContent);
         } catch (Exception e) {
-            logger.error("Failed to send email to {}: {}", to, e.getMessage(), e);
-            throw new RuntimeException("Failed to send email to " + to, e);
+            logger.error("Email send failed to {}", to, e);
+            throw new RuntimeException("Email sending failed", e);
         }
     }
 
