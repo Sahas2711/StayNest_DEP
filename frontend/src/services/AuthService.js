@@ -1,7 +1,7 @@
 // src/services/AuthService.js
 import axios from 'axios';
 import api from './ApiService'
-const API_URL = 'https://staynest-backend-dymh.onrender.com/'; // update to your backend base URL
+const API_URL = 'https://staynest-backend-dymh.onrender.com'; // update to your backend base URL
 
 const login  = async (data) => {
   const res = await axios.post(`${API_URL}/login/user`, data);

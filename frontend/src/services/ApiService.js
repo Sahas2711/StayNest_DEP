@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://staynest-backend-dymh.onrender.com/', // ✅ change if needed
+  baseURL: 'https://staynest-backend-dymh.onrender.com', // ✅ change if needed
 });
 
 api.interceptors.request.use((config) => {
