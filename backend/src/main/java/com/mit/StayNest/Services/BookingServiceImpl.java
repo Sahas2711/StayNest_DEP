@@ -60,9 +60,9 @@ public class BookingServiceImpl implements BookingService {
         Owner owner = saved.getListing().getOwner();
         User tenant = saved.getTenant();
 
-        emailService.sendBookingConfirmationEmail(tenant, listing, selectedRoomType, saved);
+       // emailService.sendBookingConfirmationEmail(tenant, listing, selectedRoomType, saved);
         logger.info("Booking email sent to tenant {} ", tenant.getEmail());
-        emailService.sendNewBookingNotificationEmail(owner, listing, tenant, selectedRoomType, saved);
+       // emailService.sendNewBookingNotificationEmail(owner, listing, tenant, selectedRoomType, saved);
         logger.info("Booking email sent to owner {} ", owner.getEmail());
 
         return saved;
@@ -167,7 +167,7 @@ public class BookingServiceImpl implements BookingService {
         String subject = "Your Booking on StayNest has been " + newStatus;
 
 
-        emailService.sendBookingConfirmationEmail(tenant, listing, selectedRoomType, booking);
+       // emailService.sendBookingConfirmationEmail(tenant, listing, selectedRoomType, booking);
         
     }
 

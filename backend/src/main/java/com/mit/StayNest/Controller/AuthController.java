@@ -215,13 +215,13 @@ public class AuthController {
         	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with this email does not exist.");
         }
      // Construct the reset link. Make sure this matches your frontend's reset password route.
-        String resetLink = "http://localhost:3000/reset-password?email=" + email; // Use your actual domain in production
+        String resetLink = "https://staynest-dep.onrender.com/reset-password?email=" + email; // Use your actual domain in production
 
         String subject = "Reset Your Password - StayNest";
 
         // The detailed HTML email template
 
-        emailService.sendForgotPasswordOtpEmail(email,userName , resetLink);
+      //  emailService.sendForgotPasswordOtpEmail(email,userName , resetLink);
         return ResponseEntity.status(HttpStatus.OK).body("Reset Link sent successfully");
     }
     

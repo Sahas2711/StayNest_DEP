@@ -28,6 +28,7 @@ const ForgotPassword = () => {
     //console.log('Forgot password request for:', email);
     await authService.forgotPassword(email);
     //alert("A password reset link has been sent to your email address.");
+    navigate("/reset-password");
     setIsSuccess(true);
   } catch (err) {
     setError(

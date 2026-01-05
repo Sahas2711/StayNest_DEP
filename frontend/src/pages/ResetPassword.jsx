@@ -5,19 +5,19 @@ import authService from '../services/AuthService';
 import { useLocation } from 'react-router-dom';
 
 const ResetPassword = () => {
- // const { email } = useParams();
+ const [email , setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
  
-  // const validateEmail = (email) => {
-  //   return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  // };
+  const validateEmail = (email) => {
+    return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 const location = useLocation();
-const queryParams = new URLSearchParams(location.search);
-const email = queryParams.get('email');
+//const queryParams = new URLSearchParams(location.search);
+//const email = queryParams.get('email');
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
@@ -84,7 +84,7 @@ const email = queryParams.get('email');
             <p>Enter your new password below.</p>
           </div>
           <form onSubmit={handleSubmit} className="forgot-form">
-            {/* <div className="form-group">
+            { <div className="form-group">
               <label htmlFor="email">Email Address</label>
               <input
                 type="email"
@@ -95,7 +95,7 @@ const email = queryParams.get('email');
                 className={error && (!email || error.toLowerCase().includes('email')) ? 'error' : ''}
                 autoComplete="email"
               />
-            </div> */}
+            </div> }
             <div className="form-group">
               <label htmlFor="newPassword">New Password</label>
               <input

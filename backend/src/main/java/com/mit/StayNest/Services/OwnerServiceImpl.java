@@ -181,7 +181,7 @@ public class OwnerServiceImpl implements OwnerService {
 	        helper.setSubject(subject);
 	        helper.setText(htmlBody, true);
 	         helper.setFrom("noreply@staynest.com");
-	        javaMailSender.send(message);
+	      //  javaMailSender.send(message);
 	        logger.info("Welcome email sent to: {}", email);
 	    } catch (MessagingException e) {
 	        logger.error("Failed to send welcome email to {}: {}", email, e.getMessage());
