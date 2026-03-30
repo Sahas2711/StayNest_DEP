@@ -327,6 +327,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](./LICEN
 
 *If you found this project useful, consider giving it a ⭐ on GitHub!*
 
-[![GitHub stars](https://img.shields.io/github/stars/your-username/staynest?style=social)](https://github.com/your-username/staynest)
+[![GitHub stars](https://img.shields.io/github/stars/your-username/staynest?style=social)](https://github.com/Sahas2711/staynest-dep)
 
 </div>
