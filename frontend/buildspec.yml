@@ -6,7 +6,7 @@ phases:
       nodejs: 20
     commands:
       - echo "Installing frontend dependencies..."
-      - npm ci
+      - npm install
 
   pre_build:
     commands:

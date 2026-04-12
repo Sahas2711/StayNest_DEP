@@ -11,7 +11,7 @@ phases:
       nodejs: 20
     commands:
       - echo "Installing frontend dependencies..."
-      - cd frontend && npm ci && cd ..
+      - npm install --prefix frontend
 
   pre_build:
     commands:
@@ -23,9 +23,9 @@ phases:
   build:
     commands:
       - echo "Building React frontend..."
-      - cd frontend && npm run build && cd ..
+      - npm run build --prefix frontend
       - echo "Building Spring Boot backend..."
-      - cd backend && mvn clean package -DskipTests && cd ..
+      - mvn clean package -DskipTests -f backend/pom.xml
 
   post_build:
     commands:
