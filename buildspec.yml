@@ -1,8 +1,7 @@
 version: 0.2
-
-# Combined buildspec for StayNest (frontend + backend)
-# Requires both Java 17 and Node.js 20 in the build environment.
-# Use a custom Docker image or run separate CodeBuild projects per service.
+# Root buildspec — delegates to pipeline/buildspec-backend.yml and pipeline/buildspec-frontend.yml
+# This file is kept for local reference only.
+# CodePipeline uses the per-service buildspecs defined in /pipeline/.
 
 phases:
   install:
@@ -10,39 +9,29 @@ phases:
       java: corretto17
       nodejs: 20
     commands:
-      - echo "Installing frontend dependencies..."
-      - npm install --prefix frontend --legacy-peer-deps
-
-  pre_build:
-    commands:
-      - echo "Pre-build checks..."
       - java -version
       - node -v
       - mvn -version
 
   build:
     commands:
-      - echo "Building React frontend..."
-      - npm run build --prefix frontend
-      - echo "Building Spring Boot backend..."
-      - mvn clean package -DskipTests -f backend/pom.xml
-
-  post_build:
-    commands:
-      - echo "All builds completed successfully."
+      - echo "Building backend..."
+      - cd backend && mvn clean package -DskipTests -q
+      - echo "Building frontend..."
+      - cd frontend && npm install --legacy-peer-deps && npm run build
 
 artifacts:
   secondary-artifacts:
-    frontend:
-      base-directory: frontend/build
-      files:
-        - "**/*"
-      name: staynest-frontend-$(date +%Y%m%d%H%M%S)
     backend:
       base-directory: backend
       files:
         - target/StayNest-0.0.1-SNAPSHOT.jar
-      name: staynest-backend-$(date +%Y%m%d%H%M%S)
+        - appspec.yml
+        - scripts/**/*
+    frontend:
+      base-directory: frontend/build
+      files:
+        - "**/*"
 
 cache:
   paths:

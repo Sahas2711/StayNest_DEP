@@ -1,20 +1,15 @@
-// src/services/apiService.js
+// src/services/ApiService.js
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://staynest-backend-dymh.onrender.com', // ✅ change if needed
+  baseURL: process.env.REACT_APP_API_BASE_URL || '',
 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  console.log("Token from localStorage:", token); // ✅ debug log
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    console.warn("🚫 No token found in localStorage! Sending request without Authorization header.");
   }
-
   return config;
 });
 

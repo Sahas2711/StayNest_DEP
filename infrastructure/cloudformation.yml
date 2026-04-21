@@ -1,0 +1,1196 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: StayNest - Production-Ready Full Stack Infrastructure
+
+Parameters:
+  DBUsername:
+    Type: String
+    Default: staynest_admin
+    NoEcho: false
+  DBPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 12
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    AllowedValues: [db.t3.micro, db.t3.small, db.t3.medium]
+  EC2InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro, t2.small, t3.micro, t3.small]
+  EC2KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+  GitHubOwner:
+    Type: String
+  GitHubRepo:
+    Type: String
+    Default: StayNest
+  GitHubBranch:
+    Type: String
+    Default: main
+  GitHubConnectionArn:
+    Type: String
+  SESFromEmail:
+    Type: String
+    Description: Verified SES sender email address
+
+
+Mappings:
+  RegionAMI:
+    us-east-1:
+      AMI: ami-0c02fb55956c7d316
+
+Resources:
+
+  # ─────────────────────────────────────────────────────────
+  # VPC & NETWORKING
+  # ─────────────────────────────────────────────────────────
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: staynest-vpc
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: staynest-igw
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-east-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: staynest-public-subnet-a
+
+  PrivateAppSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: us-east-1a
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: staynest-private-app-subnet-a
+
+  PrivateDBSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: us-east-1b
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: staynest-private-db-subnet-b
+
+  PrivateDBSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: us-east-1a
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: staynest-private-db-subnet-a
+
+  NATGatewayEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: staynest-nat-gw
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: staynest-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: staynest-private-rt
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateAppSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateAppSubnetA
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateDBSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateDBSubnetB
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateDBSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateDBSubnetA
+      RouteTableId: !Ref PrivateRouteTable
+
+
+  # ─────────────────────────────────────────────────────────
+  # SECURITY GROUPS
+  # ─────────────────────────────────────────────────────────
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP/HTTPS from internet to ALB
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: staynest-alb-sg
+
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic from ALB only on port 8080
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.0.0.0/16
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: staynest-ec2-sg
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow PostgreSQL from EC2 only
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: staynest-rds-sg
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Lambda outbound only (SES, S3 via VPC endpoints or NAT)
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: staynest-lambda-sg
+
+
+  # ─────────────────────────────────────────────────────────
+  # SECRETS MANAGER
+  # ─────────────────────────────────────────────────────────
+  DBSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: staynest/prod
+      Description: StayNest production application secrets
+      SecretString: !Sub |
+        {
+          "DB_URL": "jdbc:postgresql://${RDSInstance.Endpoint.Address}:5432/staynest?sslmode=require",
+          "DB_USERNAME": "${DBUsername}",
+          "DB_PASSWORD": "${DBPassword}",
+          "JWT_SECRET": "REPLACE_WITH_STRONG_SECRET_MIN_32_CHARS",
+          "MAIL_USERNAME": "REPLACE_WITH_GMAIL",
+          "MAIL_PASSWORD": "REPLACE_WITH_APP_PASSWORD",
+          "RESEND_API_KEY": "REPLACE_WITH_RESEND_KEY",
+          "CORS_ALLOWED_ORIGINS": "https://REPLACE_WITH_CLOUDFRONT_DOMAIN.cloudfront.net"
+        }
+    DependsOn: RDSInstance
+
+
+  # ─────────────────────────────────────────────────────────
+  # IAM ROLES
+  # ─────────────────────────────────────────────────────────
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub staynest-ec2-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: EC2AppPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:staynest/prod*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt UploadsBucket.Arn
+                  - !Sub ${UploadsBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/staynest/*
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeTags
+                Resource: '*'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub staynest-ec2-profile-${AWS::Region}
+      Roles:
+        - !Ref EC2InstanceRole
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub staynest-lambda-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/staynest-s3-notifier*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - !GetAtt UploadsBucket.Arn
+                  - !Sub ${UploadsBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                Resource: '*'
+
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub staynest-codepipeline-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelinePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetBucketVersioning
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt ArtifactBucket.Arn
+                  - !Sub ${ArtifactBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - codedeploy:CreateDeployment
+                  - codedeploy:GetDeployment
+                  - codedeploy:GetDeploymentConfig
+                  - codedeploy:GetApplicationRevision
+                  - codedeploy:RegisterApplicationRevision
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Ref GitHubConnectionArn
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: '*'
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub staynest-codebuild-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetBucketVersioning
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt ArtifactBucket.Arn
+                  - !Sub ${ArtifactBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:staynest/prod*
+
+  CodeDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub staynest-codedeploy-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codedeploy.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+
+  FrontendDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub staynest-frontend-deploy-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: FrontendDeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                  - s3:GetObject
+                Resource:
+                  - !GetAtt FrontendBucket.Arn
+                  - !Sub ${FrontendBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt ArtifactBucket.Arn
+                  - !Sub ${ArtifactBucket.Arn}/*
+
+
+  # ─────────────────────────────────────────────────────────
+  # S3 BUCKETS
+  # ─────────────────────────────────────────────────────────
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub staynest-artifacts-${AWS::AccountId}-${AWS::Region}
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireOldArtifacts
+            Status: Enabled
+            ExpirationInDays: 30
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub staynest-frontend-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: CloudFrontDistribution
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub ${FrontendBucket.Arn}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
+
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    DependsOn: S3LambdaInvokePermission
+    Properties:
+      BucketName: !Sub staynest-uploads-${AWS::AccountId}-${AWS::Region}
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt S3NotifierLambda.Arn
+
+
+  # ─────────────────────────────────────────────────────────
+  # CLOUDFRONT
+  # ─────────────────────────────────────────────────────────
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: staynest-frontend-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn: FrontendBucket
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        HttpVersion: http2
+        Origins:
+          - Id: S3FrontendOrigin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !GetAtt CloudFrontOAC.Id
+        DefaultCacheBehavior:
+          TargetOriginId: S3FrontendOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          Compress: true
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+        PriceClass: PriceClass_100
+
+
+  # ─────────────────────────────────────────────────────────
+  # APPLICATION LOAD BALANCER
+  # ─────────────────────────────────────────────────────────
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      Name: staynest-alb
+      Scheme: internet-facing
+      Type: application
+      IpAddressType: ipv4
+      Subnets:
+        - !Ref PublicSubnetA
+        - !Ref PrivateAppSubnetA
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '60'
+        - Key: access_logs.s3.enabled
+          Value: 'false'
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: staynest-backend-tg
+      VpcId: !Ref VPC
+      Protocol: HTTP
+      Port: 8080
+      TargetType: instance
+      HealthCheckEnabled: true
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /health
+      HealthCheckPort: '8080'
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+
+  # ─────────────────────────────────────────────────────────
+  # EC2 LAUNCH TEMPLATE + AUTO SCALING GROUP
+  # ─────────────────────────────────────────────────────────
+  BackendLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    DependsOn:
+      - EC2InstanceProfile
+      - DBSecret
+    Properties:
+      LaunchTemplateName: staynest-backend-lt
+      LaunchTemplateData:
+        ImageId: !FindInMap [RegionAMI, !Ref AWS::Region, AMI]
+        InstanceType: !Ref EC2InstanceType
+        KeyName: !Ref EC2KeyPairName
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            set -e
+            yum update -y
+            yum install -y java-17-amazon-corretto ruby wget jq
+
+            # Install CodeDeploy agent
+            cd /home/ec2-user
+            wget https://aws-codedeploy-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/latest/install
+            chmod +x ./install
+            ./install auto
+            systemctl enable codedeploy-agent
+            systemctl start codedeploy-agent
+
+            # Install CloudWatch agent
+            yum install -y amazon-cloudwatch-agent
+
+            # Create app directory
+            mkdir -p /opt/staynest
+            chown ec2-user:ec2-user /opt/staynest
+
+            # Fetch secrets and write env file
+            REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/region)
+            SECRET_JSON=$(aws secretsmanager get-secret-value \
+              --region "$REGION" \
+              --secret-id "staynest/prod" \
+              --query SecretString \
+              --output text)
+
+            cat > /opt/staynest/app.env << ENVEOF
+            DB_URL=$(echo "$SECRET_JSON" | jq -r '.DB_URL')
+            DB_USERNAME=$(echo "$SECRET_JSON" | jq -r '.DB_USERNAME')
+            DB_PASSWORD=$(echo "$SECRET_JSON" | jq -r '.DB_PASSWORD')
+            JWT_SECRET=$(echo "$SECRET_JSON" | jq -r '.JWT_SECRET')
+            MAIL_USERNAME=$(echo "$SECRET_JSON" | jq -r '.MAIL_USERNAME')
+            MAIL_PASSWORD=$(echo "$SECRET_JSON" | jq -r '.MAIL_PASSWORD')
+            RESEND_API_KEY=$(echo "$SECRET_JSON" | jq -r '.RESEND_API_KEY')
+            CORS_ALLOWED_ORIGINS=$(echo "$SECRET_JSON" | jq -r '.CORS_ALLOWED_ORIGINS')
+            PORT=8080
+            ENVEOF
+
+            chmod 600 /opt/staynest/app.env
+            chown ec2-user:ec2-user /opt/staynest/app.env
+
+            # Create systemd service
+            cat > /etc/systemd/system/staynest.service << 'SVCEOF'
+            [Unit]
+            Description=StayNest Spring Boot Application
+            After=network.target
+
+            [Service]
+            Type=simple
+            User=ec2-user
+            WorkingDirectory=/opt/staynest
+            EnvironmentFile=/opt/staynest/app.env
+            ExecStart=/usr/bin/java -jar /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar
+            SuccessExitStatus=143
+            Restart=on-failure
+            RestartSec=10
+            StandardOutput=journal
+            StandardError=journal
+            SyslogIdentifier=staynest
+
+            [Install]
+            WantedBy=multi-user.target
+            SVCEOF
+
+            systemctl daemon-reload
+            systemctl enable staynest
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: staynest-backend
+              - Key: Application
+                Value: StayNest
+
+  BackendAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      - NATGateway
+      - ALBTargetGroup
+    Properties:
+      AutoScalingGroupName: staynest-backend-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref BackendLaunchTemplate
+        Version: !GetAtt BackendLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 4
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - !Ref PrivateAppSubnetA
+      TargetGroupARNs:
+        - !Ref ALBTargetGroup
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 120
+      Tags:
+        - Key: Name
+          Value: staynest-backend
+          PropagateAtLaunch: true
+        - Key: Application
+          Value: StayNest
+          PropagateAtLaunch: true
+
+  BackendScalingPolicyCPUUp:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref BackendAutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70.0
+
+
+  # ─────────────────────────────────────────────────────────
+  # RDS POSTGRESQL
+  # ─────────────────────────────────────────────────────────
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: StayNest RDS subnet group
+      DBSubnetGroupName: staynest-rds-subnet-group
+      SubnetIds:
+        - !Ref PrivateDBSubnetA
+        - !Ref PrivateDBSubnetB
+
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    DependsOn:
+      - RDSSubnetGroup
+      - RDSSecurityGroup
+    DeletionPolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: staynest-postgres
+      DBInstanceClass: !Ref DBInstanceClass
+      Engine: postgres
+      EngineVersion: '15.4'
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      DBName: staynest
+      AllocatedStorage: '20'
+      MaxAllocatedStorage: 100
+      StorageType: gp3
+      StorageEncrypted: true
+      MultiAZ: false
+      PubliclyAccessible: false
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: 02:00-03:00
+      PreferredMaintenanceWindow: sun:04:00-sun:05:00
+      DeletionProtection: true
+      EnableCloudwatchLogsExports:
+        - postgresql
+      Tags:
+        - Key: Name
+          Value: staynest-postgres
+
+
+  # ─────────────────────────────────────────────────────────
+  # LAMBDA (S3 Upload Notifier → SES Email)
+  # ─────────────────────────────────────────────────────────
+  S3NotifierLambda:
+    Type: AWS::Lambda::Function
+    DependsOn: LambdaExecutionRole
+    Properties:
+      FunctionName: staynest-s3-notifier
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          SES_FROM_EMAIL: !Ref SESFromEmail
+          NOTIFY_EMAIL: !Ref SESFromEmail
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateAppSubnetA
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          import urllib.parse
+
+          ses = boto3.client('ses', region_name='us-east-1')
+
+          def handler(event, context):
+              from_email = os.environ['SES_FROM_EMAIL']
+              notify_email = os.environ['NOTIFY_EMAIL']
+
+              for record in event.get('Records', []):
+                  bucket = record['s3']['bucket']['name']
+                  key = urllib.parse.unquote_plus(record['s3']['object']['key'])
+                  size = record['s3']['object'].get('size', 0)
+
+                  subject = f"StayNest: New file uploaded to {bucket}"
+                  body = (
+                      f"A new file has been uploaded to S3.\n\n"
+                      f"Bucket: {bucket}\n"
+                      f"Key: {key}\n"
+                      f"Size: {size} bytes\n"
+                  )
+
+                  ses.send_email(
+                      Source=from_email,
+                      Destination={'ToAddresses': [notify_email]},
+                      Message={
+                          'Subject': {'Data': subject},
+                          'Body': {'Text': {'Data': body}}
+                      }
+                  )
+                  print(f"Notification sent for s3://{bucket}/{key}")
+
+              return {'statusCode': 200, 'body': 'OK'}
+      Tags:
+        - Key: Application
+          Value: StayNest
+
+  S3LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt S3NotifierLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub arn:aws:s3:::staynest-uploads-${AWS::AccountId}-${AWS::Region}
+
+
+  # ─────────────────────────────────────────────────────────
+  # CLOUDWATCH LOG GROUPS
+  # ─────────────────────────────────────────────────────────
+  AppLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /staynest/backend
+      RetentionInDays: 30
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/staynest-s3-notifier
+      RetentionInDays: 14
+
+  RDSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /staynest/rds/postgresql
+      RetentionInDays: 14
+
+  # ─────────────────────────────────────────────────────────
+  # CODEDEPLOY
+  # ─────────────────────────────────────────────────────────
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: staynest-backend
+      ComputePlatform: Server
+
+  CodeDeployDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    DependsOn:
+      - BackendAutoScalingGroup
+      - CodeDeployApplication
+    Properties:
+      ApplicationName: !Ref CodeDeployApplication
+      DeploymentGroupName: staynest-backend-dg
+      ServiceRoleArn: !GetAtt CodeDeployRole.Arn
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
+      AutoScalingGroups:
+        - !Ref BackendAutoScalingGroup
+      DeploymentStyle:
+        DeploymentType: IN_PLACE
+        DeploymentOption: WITHOUT_TRAFFIC_CONTROL
+
+  # ─────────────────────────────────────────────────────────
+  # CODEBUILD PROJECTS
+  # ─────────────────────────────────────────────────────────
+  BackendBuildProject:
+    Type: AWS::CodeBuild::Project
+    DependsOn: CodeBuildRole
+    Properties:
+      Name: staynest-backend-build
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: ARTIFACT_BUCKET
+            Value: !Ref ArtifactBucket
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: pipeline/buildspec-backend.yml
+      Cache:
+        Type: S3
+        Location: !Sub ${ArtifactBucket}/cache/backend
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: /staynest/codebuild/backend
+
+  FrontendBuildProject:
+    Type: AWS::CodeBuild::Project
+    DependsOn:
+      - FrontendDeployRole
+      - CloudFrontDistribution
+    Properties:
+      Name: staynest-frontend-build
+      ServiceRole: !GetAtt FrontendDeployRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: FRONTEND_BUCKET
+            Value: !Ref FrontendBucket
+          - Name: CLOUDFRONT_DISTRIBUTION_ID
+            Value: !Ref CloudFrontDistribution
+          - Name: REACT_APP_API_BASE_URL
+            Value: !Sub http://${ALB.DNSName}
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: pipeline/buildspec-frontend.yml
+      Cache:
+        Type: S3
+        Location: !Sub ${ArtifactBucket}/cache/frontend
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: /staynest/codebuild/frontend
+
+  # ─────────────────────────────────────────────────────────
+  # CODEPIPELINE
+  # ─────────────────────────────────────────────────────────
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    DependsOn:
+      - BackendBuildProject
+      - FrontendBuildProject
+      - CodeDeployDeploymentGroup
+    Properties:
+      Name: staynest-pipeline
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GitHubConnectionArn
+                FullRepositoryId: !Sub ${GitHubOwner}/${GitHubRepo}
+                BranchName: !Ref GitHubBranch
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+              RunOrder: 1
+
+        - Name: Build
+          Actions:
+            - Name: BuildBackend
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref BackendBuildProject
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: BackendArtifact
+              RunOrder: 1
+            - Name: BuildFrontend
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref FrontendBuildProject
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: FrontendArtifact
+              RunOrder: 1
+
+        - Name: Deploy
+          Actions:
+            - Name: DeployBackend
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CodeDeploy
+                Version: '1'
+              Configuration:
+                ApplicationName: !Ref CodeDeployApplication
+                DeploymentGroupName: !Ref CodeDeployDeploymentGroup
+              InputArtifacts:
+                - Name: BackendArtifact
+              RunOrder: 1
+
+
+# ─────────────────────────────────────────────────────────
+# OUTPUTS
+# ─────────────────────────────────────────────────────────
+Outputs:
+  ALBDNSName:
+    Description: Application Load Balancer DNS (backend API base URL)
+    Value: !Sub http://${ALB.DNSName}
+    Export:
+      Name: StayNest-ALB-DNS
+
+  CloudFrontURL:
+    Description: CloudFront distribution URL (frontend)
+    Value: !Sub https://${CloudFrontDistribution.DomainName}
+    Export:
+      Name: StayNest-CloudFront-URL
+
+  FrontendBucketName:
+    Description: S3 bucket hosting the React build
+    Value: !Ref FrontendBucket
+    Export:
+      Name: StayNest-Frontend-Bucket
+
+  UploadsBucketName:
+    Description: S3 bucket for user uploads
+    Value: !Ref UploadsBucket
+    Export:
+      Name: StayNest-Uploads-Bucket
+
+  ArtifactBucketName:
+    Description: S3 bucket for CI/CD artifacts
+    Value: !Ref ArtifactBucket
+    Export:
+      Name: StayNest-Artifact-Bucket
+
+  RDSEndpoint:
+    Description: RDS PostgreSQL endpoint
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: StayNest-RDS-Endpoint
+
+  RDSPort:
+    Description: RDS PostgreSQL port
+    Value: !GetAtt RDSInstance.Endpoint.Port
+    Export:
+      Name: StayNest-RDS-Port
+
+  DBSecretArn:
+    Description: Secrets Manager ARN for application secrets
+    Value: !Ref DBSecret
+    Export:
+      Name: StayNest-DB-Secret-ARN
+
+  PipelineName:
+    Description: CodePipeline name
+    Value: !Ref Pipeline
+    Export:
+      Name: StayNest-Pipeline-Name
+
+  VPCId:
+    Description: VPC ID
+    Value: !Ref VPC
+    Export:
+      Name: StayNest-VPC-ID
+
+  AutoScalingGroupName:
+    Description: Backend Auto Scaling Group name
+    Value: !Ref BackendAutoScalingGroup
+    Export:
+      Name: StayNest-ASG-Name

@@ -1,18 +1,18 @@
 // src/services/AuthService.js
 import axios from 'axios';
-import api from './ApiService'
-const API_URL = 'https://staynest-backend-dymh.onrender.com'; // update to your backend base URL
+import api from './ApiService';
 
-const login  = async (data) => {
+const API_URL = process.env.REACT_APP_API_BASE_URL || '';
+
+const login = async (data) => {
   const res = await axios.post(`${API_URL}/login/user`, data);
   return res.data;
 };
 
-const ownerLogin  = async (data) => {
+const ownerLogin = async (data) => {
   const res = await axios.post(`${API_URL}/login/owner`, data);
   return res.data;
 };
-
 
 const registerUser = async (data) => {
   const res = await axios.post(`${API_URL}/register`, data);
@@ -23,15 +23,17 @@ const registerOwner = async (data) => {
   const res = await axios.post(`${API_URL}/owner/register`, data);
   return res.data;
 };
+
 const forgotPassword = async (email) => {
   const res = await axios.post(`${API_URL}/forgot-password`, { email });
   return res.data;
 };
 
 const updatePassword = async (data) => {
-  const res = await api.put(`${API_URL}/users/update`, data);
+  const res = await api.put('/users/update', data);
   return res.data;
 };
+
 const resetPassword = async (data) => {
   const res = await axios.post(
     `${API_URL}/reset-password?email=${data.email}&newPassword=${data.password}`
@@ -39,7 +41,6 @@ const resetPassword = async (data) => {
   return res.data;
 };
 
-// ✅ Named variable export
 const authService = {
   login,
   registerUser,

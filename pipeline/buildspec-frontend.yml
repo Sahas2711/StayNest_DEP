@@ -1,0 +1,48 @@
+version: 0.2
+
+env:
+  variables:
+    # REACT_APP_API_BASE_URL is injected by CodeBuild environment (set in CloudFormation)
+    GENERATE_SOURCEMAP: "false"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "=== Installing frontend dependencies ==="
+      - node -v
+      - npm -v
+      - cd frontend
+      - npm install --legacy-peer-deps
+
+  pre_build:
+    commands:
+      - echo "=== REACT_APP_API_BASE_URL is ${REACT_APP_API_BASE_URL} ==="
+
+  build:
+    commands:
+      - echo "=== Building React application ==="
+      - cd frontend
+      - npm run build
+      - echo "=== Frontend build complete ==="
+
+  post_build:
+    commands:
+      - echo "=== Deploying frontend to S3 ==="
+      - cd frontend
+      # Sync build output to S3, delete stale files
+      - aws s3 sync build/ s3://${FRONTEND_BUCKET}/ --delete --cache-control "public,max-age=31536000,immutable" --exclude "index.html"
+      - aws s3 cp build/index.html s3://${FRONTEND_BUCKET}/index.html --cache-control "no-cache,no-store,must-revalidate"
+      - echo "=== Invalidating CloudFront cache ==="
+      - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
+      - echo "=== Frontend deployment complete ==="
+
+artifacts:
+  files:
+    - "**/*"
+  base-directory: frontend/build
+
+cache:
+  paths:
+    - frontend/node_modules/**/*

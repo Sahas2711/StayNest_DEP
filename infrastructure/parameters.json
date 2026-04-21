@@ -1,0 +1,42 @@
+[
+  {
+    "ParameterKey": "DBUsername",
+    "ParameterValue": "staynest_admin"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "REPLACE_WITH_STRONG_PASSWORD_MIN_12_CHARS"
+  },
+  {
+    "ParameterKey": "DBInstanceClass",
+    "ParameterValue": "db.t3.micro"
+  },
+  {
+    "ParameterKey": "EC2InstanceType",
+    "ParameterValue": "t2.micro"
+  },
+  {
+    "ParameterKey": "EC2KeyPairName",
+    "ParameterValue": "REPLACE_WITH_YOUR_KEY_PAIR_NAME"
+  },
+  {
+    "ParameterKey": "GitHubOwner",
+    "ParameterValue": "REPLACE_WITH_YOUR_GITHUB_USERNAME"
+  },
+  {
+    "ParameterKey": "GitHubRepo",
+    "ParameterValue": "StayNest"
+  },
+  {
+    "ParameterKey": "GitHubBranch",
+    "ParameterValue": "main"
+  },
+  {
+    "ParameterKey": "GitHubConnectionArn",
+    "ParameterValue": "arn:aws:codestar-connections:us-east-1:ACCOUNT_ID:connection/CONNECTION_ID"
+  },
+  {
+    "ParameterKey": "SESFromEmail",
+    "ParameterValue": "REPLACE_WITH_VERIFIED_SES_EMAIL"
+  }
+]
