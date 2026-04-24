@@ -85,13 +85,19 @@ aws cloudformation describe-stacks \
   --query "Stacks[0].Outputs[*].[OutputKey,OutputValue]" \
   --output table
 
-# ── Post-deploy: update Secrets Manager with real values ──
+# ── Post-deploy: patch secret with real RDS endpoint ──────
 echo ""
-echo "=== IMPORTANT POST-DEPLOY STEPS ==="
+echo "=== Patching Secrets Manager with real RDS endpoint ==="
 SECRET_ARN=$(aws cloudformation describe-stacks \
   --stack-name "$STACK_NAME" \
   --region "$REGION" \
   --query "Stacks[0].Outputs[?OutputKey=='DBSecretArn'].OutputValue" \
+  --output text)
+
+RDS_ENDPOINT=$(aws cloudformation describe-stacks \
+  --stack-name "$STACK_NAME" \
+  --region "$REGION" \
+  --query "Stacks[0].Outputs[?OutputKey=='RDSEndpoint'].OutputValue" \
   --output text)
 
 CF_URL=$(aws cloudformation describe-stacks \
@@ -100,16 +106,33 @@ CF_URL=$(aws cloudformation describe-stacks \
   --query "Stacks[0].Outputs[?OutputKey=='CloudFrontURL'].OutputValue" \
   --output text)
 
+# Fetch current secret, replace placeholder endpoint
+CURRENT_SECRET=$(aws secretsmanager get-secret-value \
+  --secret-id "$SECRET_ARN" \
+  --region "$REGION" \
+  --query SecretString \
+  --output text)
+
+UPDATED_SECRET=$(echo "$CURRENT_SECRET" | \
+  jq --arg ep "$RDS_ENDPOINT" \
+     --arg cf "$CF_URL" \
+  '.DB_URL = "jdbc:postgresql://\($ep):5432/staynest?sslmode=require" |
+   .CORS_ALLOWED_ORIGINS = $cf')
+
+aws secretsmanager update-secret \
+  --secret-id "$SECRET_ARN" \
+  --secret-string "$UPDATED_SECRET" \
+  --region "$REGION"
+
+echo "  ✓ DB_URL updated to: jdbc:postgresql://$RDS_ENDPOINT:5432/staynest"
+echo "  ✓ CORS_ALLOWED_ORIGINS updated to: $CF_URL"
 echo ""
-echo "1. Update the Secrets Manager secret with real values:"
-echo "   Secret ARN: $SECRET_ARN"
-echo "   Run: aws secretsmanager update-secret --secret-id \"$SECRET_ARN\" --secret-string file://infrastructure/secrets-template.json --region $REGION"
+echo "=== REMAINING MANUAL STEPS ==="
+echo "Update these keys in the secret (run: aws secretsmanager update-secret --secret-id $SECRET_ARN --secret-string ...):"
+echo "  JWT_SECRET        → a strong random string (min 32 chars)"
+echo "  MAIL_USERNAME     → your Gmail address"
+echo "  MAIL_PASSWORD     → your Gmail app password"
+echo "  RESEND_API_KEY    → your Resend API key"
 echo ""
-echo "2. Set CORS_ALLOWED_ORIGINS in the secret to your CloudFront URL:"
-echo "   CloudFront URL: $CF_URL"
-echo ""
-echo "3. Create a GitHub CodeStar Connection if not done:"
-echo "   https://console.aws.amazon.com/codesuite/settings/connections"
-echo ""
-echo "4. Push to GitHub main branch to trigger the pipeline:"
-echo "   https://console.aws.amazon.com/codesuite/codepipeline/pipelines"
+echo "Then push to GitHub main to trigger the pipeline:"
+echo "  https://console.aws.amazon.com/codesuite/codepipeline/pipelines"

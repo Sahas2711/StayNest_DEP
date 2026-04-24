@@ -38,5 +38,9 @@
   {
     "ParameterKey": "SESFromEmail",
     "ParameterValue": "REPLACE_WITH_VERIFIED_SES_EMAIL"
+  },
+  {
+    "ParameterKey": "ExistingRDSEndpoint",
+    "ParameterValue": ""
   }
 ]

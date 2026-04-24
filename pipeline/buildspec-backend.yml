@@ -5,37 +5,18 @@ phases:
     runtime-versions:
       java: corretto17
     commands:
-      - echo "=== Installing backend dependencies ==="
       - java -version
       - mvn -version
-
-  pre_build:
-    commands:
-      - echo "=== Fetching secrets from Secrets Manager ==="
-      # Retrieve secret JSON and export each key as env var for build-time validation only
-      # Runtime secrets are injected via app.env on EC2 (see appspec hooks)
-      - echo "Pre-build checks passed"
 
   build:
     commands:
       - echo "=== Building Spring Boot JAR ==="
       - cd backend
       - mvn clean package -DskipTests -q
-      - echo "=== Build complete ==="
       - ls -lh target/StayNest-0.0.1-SNAPSHOT.jar
-
-  post_build:
-    commands:
-      - echo "=== Preparing deployment package ==="
-      - cd ..
-      # Copy appspec and deployment scripts alongside the JAR
-      - cp pipeline/appspec.yml backend/appspec.yml
-      - cp -r pipeline/scripts backend/scripts
 
 artifacts:
   files:
-    - appspec.yml
-    - scripts/**/*
     - target/StayNest-0.0.1-SNAPSHOT.jar
   base-directory: backend
   discard-paths: no

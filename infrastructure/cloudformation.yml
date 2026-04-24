@@ -33,12 +33,55 @@ Parameters:
   SESFromEmail:
     Type: String
     Description: Verified SES sender email address
+  ExistingRDSEndpoint:
+    Type: String
+    Default: ''
+    Description: >
+      Leave EMPTY to create a new RDS instance.
+      If an RDS instance already exists, provide its endpoint here
+      (e.g. staynest-postgres.xxxx.ap-south-1.rds.amazonaws.com).
+      When non-empty, all RDS resources (instance, subnet group, probe
+      Lambda, WaitCondition) are skipped entirely.
+
+Conditions:
+  CreateRDS: !Equals [!Ref ExistingRDSEndpoint, '']
+  UseExistingRDS: !Not [!Equals [!Ref ExistingRDSEndpoint, '']]
 
 
 Mappings:
   RegionAMI:
     us-east-1:
       AMI: ami-0c02fb55956c7d316
+    ap-south-1:
+      AMI: ami-0f58b397bc5c1f2e8
+    us-east-2:
+      AMI: ami-0b0dcb5067f052a63
+    us-west-2:
+      AMI: ami-0ceecbb0f30a902a6
+    eu-west-1:
+      AMI: ami-0d71ea30463e0ff49
+    ap-southeast-1:
+      AMI: ami-0c802847a7dd848c0
+
+  RegionAZ:
+    us-east-1:
+      AZA: us-east-1a
+      AZB: us-east-1b
+    ap-south-1:
+      AZA: ap-south-1a
+      AZB: ap-south-1b
+    us-east-2:
+      AZA: us-east-2a
+      AZB: us-east-2b
+    us-west-2:
+      AZA: us-west-2a
+      AZB: us-west-2b
+    eu-west-1:
+      AZA: eu-west-1a
+      AZB: eu-west-1b
+    ap-southeast-1:
+      AZA: ap-southeast-1a
+      AZB: ap-southeast-1b
 
 Resources:
 
@@ -73,18 +116,35 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZA]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: staynest-public-subnet-a
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.5.0/24
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZB]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: staynest-public-subnet-b
+
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTable
 
   PrivateAppSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZA]
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
@@ -95,7 +155,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.3.0/24
-      AvailabilityZone: us-east-1b
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZB]
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
@@ -106,7 +166,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.4.0/24
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZA]
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
@@ -268,18 +328,22 @@ Resources:
     Properties:
       Name: staynest/prod
       Description: StayNest production application secrets
-      SecretString: !Sub |
-        {
-          "DB_URL": "jdbc:postgresql://${RDSInstance.Endpoint.Address}:5432/staynest?sslmode=require",
-          "DB_USERNAME": "${DBUsername}",
-          "DB_PASSWORD": "${DBPassword}",
-          "JWT_SECRET": "REPLACE_WITH_STRONG_SECRET_MIN_32_CHARS",
-          "MAIL_USERNAME": "REPLACE_WITH_GMAIL",
-          "MAIL_PASSWORD": "REPLACE_WITH_APP_PASSWORD",
-          "RESEND_API_KEY": "REPLACE_WITH_RESEND_KEY",
-          "CORS_ALLOWED_ORIGINS": "https://REPLACE_WITH_CLOUDFRONT_DOMAIN.cloudfront.net"
-        }
-    DependsOn: RDSInstance
+      SecretString: !Sub
+        - |
+          {
+            "DB_URL": "jdbc:postgresql://${ResolvedEndpoint}:5432/staynest?sslmode=require",
+            "DB_USERNAME": "${DBUsername}",
+            "DB_PASSWORD": "${DBPassword}",
+            "JWT_SECRET": "REPLACE_WITH_STRONG_SECRET_MIN_32_CHARS",
+            "MAIL_USERNAME": "REPLACE_WITH_GMAIL",
+            "MAIL_PASSWORD": "REPLACE_WITH_APP_PASSWORD",
+            "RESEND_API_KEY": "REPLACE_WITH_RESEND_KEY",
+            "CORS_ALLOWED_ORIGINS": "https://REPLACE_WITH_CLOUDFRONT_DOMAIN.cloudfront.net"
+          }
+        - ResolvedEndpoint: !If
+            - CreateRDS
+            - PENDING_RDS_ENDPOINT
+            - !Ref ExistingRDSEndpoint
 
 
   # ─────────────────────────────────────────────────────────
@@ -310,12 +374,19 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::staynest-artifacts-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:s3:::staynest-artifacts-${AWS::AccountId}-${AWS::Region}/*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
                   - s3:PutObject
                   - s3:DeleteObject
                   - s3:ListBucket
                 Resource:
-                  - !GetAtt UploadsBucket.Arn
-                  - !Sub ${UploadsBucket.Arn}/*
+                  - !Sub arn:aws:s3:::staynest-uploads-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:s3:::staynest-uploads-${AWS::AccountId}-${AWS::Region}/*
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
@@ -360,8 +431,8 @@ Resources:
                 Action:
                   - s3:GetObject
                 Resource:
-                  - !GetAtt UploadsBucket.Arn
-                  - !Sub ${UploadsBucket.Arn}/*
+                  - !Sub arn:aws:s3:::staynest-uploads-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:s3:::staynest-uploads-${AWS::AccountId}-${AWS::Region}/*
               - Effect: Allow
                 Action:
                   - ses:SendEmail
@@ -406,11 +477,9 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action:
-                  - codedeploy:CreateDeployment
-                  - codedeploy:GetDeployment
-                  - codedeploy:GetDeploymentConfig
-                  - codedeploy:GetApplicationRevision
-                  - codedeploy:RegisterApplicationRevision
+                  - ssm:SendCommand
+                  - ssm:GetCommandInvocation
+                  - ssm:ListCommandInvocations
                 Resource: '*'
               - Effect: Allow
                 Action:
@@ -458,18 +527,48 @@ Resources:
                 Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:staynest/prod*
 
   CodeDeployRole:
+    # Kept as a no-op placeholder — CodeDeploy replaced by SSM-based deploy
+    # Remove this if you want a fully clean template
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub staynest-codedeploy-role-${AWS::Region}
+      RoleName: !Sub staynest-ssm-deploy-role-${AWS::Region}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              Service: codedeploy.amazonaws.com
+              Service: codebuild.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+      Policies:
+        - PolicyName: SSMDeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:SendCommand
+                  - ssm:GetCommandInvocation
+                  - ssm:ListCommandInvocations
+                  - ssm:DescribeInstanceInformation
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeInstances
+                  - autoscaling:DescribeAutoScalingGroups
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::staynest-artifacts-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:s3:::staynest-artifacts-${AWS::AccountId}-${AWS::Region}/*
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
 
   FrontendDeployRole:
     Type: AWS::IAM::Role
@@ -494,8 +593,8 @@ Resources:
                   - s3:ListBucket
                   - s3:GetObject
                 Resource:
-                  - !GetAtt FrontendBucket.Arn
-                  - !Sub ${FrontendBucket.Arn}/*
+                  - !Sub arn:aws:s3:::staynest-frontend-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:s3:::staynest-frontend-${AWS::AccountId}-${AWS::Region}/*
               - Effect: Allow
                 Action:
                   - cloudfront:CreateInvalidation
@@ -648,7 +747,7 @@ Resources:
       IpAddressType: ipv4
       Subnets:
         - !Ref PublicSubnetA
-        - !Ref PrivateAppSubnetA
+        - !Ref PublicSubnetB
       SecurityGroups:
         - !Ref ALBSecurityGroup
       LoadBalancerAttributes:
@@ -710,15 +809,11 @@ Resources:
             #!/bin/bash
             set -e
             yum update -y
-            yum install -y java-17-amazon-corretto ruby wget jq
+            yum install -y java-17-amazon-corretto wget jq
 
-            # Install CodeDeploy agent
-            cd /home/ec2-user
-            wget https://aws-codedeploy-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/latest/install
-            chmod +x ./install
-            ./install auto
-            systemctl enable codedeploy-agent
-            systemctl start codedeploy-agent
+            # SSM agent is pre-installed on Amazon Linux 2 — ensure it's running
+            systemctl enable amazon-ssm-agent
+            systemctl start amazon-ssm-agent
 
             # Install CloudWatch agent
             yum install -y amazon-cloudwatch-agent
@@ -826,6 +921,7 @@ Resources:
   # ─────────────────────────────────────────────────────────
   RDSSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
+    Condition: CreateRDS
     Properties:
       DBSubnetGroupDescription: StayNest RDS subnet group
       DBSubnetGroupName: staynest-rds-subnet-group
@@ -835,6 +931,7 @@ Resources:
 
   RDSInstance:
     Type: AWS::RDS::DBInstance
+    Condition: CreateRDS
     DependsOn:
       - RDSSubnetGroup
       - RDSSecurityGroup
@@ -843,7 +940,6 @@ Resources:
       DBInstanceIdentifier: staynest-postgres
       DBInstanceClass: !Ref DBInstanceClass
       Engine: postgres
-      EngineVersion: '15.4'
       MasterUsername: !Ref DBUsername
       MasterUserPassword: !Ref DBPassword
       DBName: staynest
@@ -856,15 +952,180 @@ Resources:
       DBSubnetGroupName: !Ref RDSSubnetGroup
       VPCSecurityGroups:
         - !Ref RDSSecurityGroup
-      BackupRetentionPeriod: 7
-      PreferredBackupWindow: 02:00-03:00
+      BackupRetentionPeriod: 0
       PreferredMaintenanceWindow: sun:04:00-sun:05:00
-      DeletionProtection: true
+      DeletionProtection: false
       EnableCloudwatchLogsExports:
         - postgresql
       Tags:
         - Key: Name
           Value: staynest-postgres
+
+  # === ADDED: WaitCondition Setup ===
+  RDSWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: CreateRDS
+
+  RDSWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    Condition: CreateRDS
+    DependsOn: RDSProbeCustomResource
+    Properties:
+      Handle: !Ref RDSWaitHandle
+      Timeout: '900'
+      Count: 1
+
+  # Probe Lambda — runs inside the VPC, polls RDS port 5432,
+  # then sends cfn-signal to RDSWaitHandle once reachable.
+  RDSProbeRole:
+    Type: AWS::IAM::Role
+    Condition: CreateRDS
+    Properties:
+      RoleName: !Sub staynest-rds-probe-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: RDSProbePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                Resource: '*'
+
+  RDSProbeLambda:
+    Type: AWS::Lambda::Function
+    Condition: CreateRDS
+    DependsOn:
+      - RDSProbeRole
+      - RDSInstance
+    Properties:
+      FunctionName: staynest-rds-probe
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt RDSProbeRole.Arn
+      Timeout: 840
+      MemorySize: 128
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroup
+        SubnetIds:
+          - !Ref PrivateAppSubnetA
+      Environment:
+        Variables:
+          RDS_HOST: !GetAtt RDSInstance.Endpoint.Address
+          RDS_PORT: !GetAtt RDSInstance.Endpoint.Port
+          WAIT_HANDLE_URL: !Ref RDSWaitHandle      Code:
+        ZipFile: |
+          import socket
+          import time
+          import json
+          import os
+          import urllib.request
+
+          def handler(event, context):
+              host = os.environ['RDS_HOST']
+              port = int(os.environ['RDS_PORT'])
+              wait_url = os.environ['WAIT_HANDLE_URL']
+              cfn_response_url = event.get('ResponseURL', '')
+              physical_id = event.get('PhysicalResourceId', 'RDSProbe')
+
+              # Stack deletion — respond success immediately to both
+              if event.get('RequestType') == 'Delete':
+                  send_cfn_response(cfn_response_url, event, 'SUCCESS', physical_id, 'Delete OK')
+                  return
+
+              # Probe RDS TCP port
+              max_attempts = 55  # 55 x 15s = 825s, within 840s Lambda timeout
+              reached = False
+              last_error = ''
+              for attempt in range(1, max_attempts + 1):
+                  try:
+                      sock = socket.create_connection((host, port), timeout=10)
+                      sock.close()
+                      print(f"RDS reachable on attempt {attempt}.")
+                      reached = True
+                      break
+                  except (socket.timeout, socket.error) as e:
+                      last_error = str(e)
+                      print(f"Attempt {attempt}/{max_attempts}: {e}. Retrying in 15s...")
+                      time.sleep(15)
+
+              if reached:
+                  # Signal WaitConditionHandle
+                  send_wait_signal(wait_url, 'SUCCESS', f'RDS ready after {attempt} attempts')
+                  # Respond to CloudFormation CustomResource
+                  send_cfn_response(cfn_response_url, event, 'SUCCESS', physical_id, 'RDS is ready')
+              else:
+                  send_wait_signal(wait_url, 'FAILURE', f'RDS unreachable: {last_error}')
+                  send_cfn_response(cfn_response_url, event, 'FAILED', physical_id, f'RDS unreachable: {last_error}')
+
+          def send_wait_signal(url, status, reason):
+              if not url:
+                  return
+              body = json.dumps({
+                  'Status': status,
+                  'Reason': reason,
+                  'UniqueId': 'RDSProbe',
+                  'Data': reason
+              }).encode('utf-8')
+              req = urllib.request.Request(url, data=body, method='PUT',
+                                           headers={'Content-Type': ''})
+              try:
+                  urllib.request.urlopen(req, timeout=30)
+                  print(f"WaitHandle signal sent: {status}")
+              except Exception as e:
+                  print(f"WaitHandle signal error (non-fatal): {e}")
+
+          def send_cfn_response(url, event, status, physical_id, reason):
+              if not url:
+                  print(f"No ResponseURL — skipping cfn response (status={status})")
+                  return
+              body = json.dumps({
+                  'Status': status,
+                  'Reason': reason,
+                  'PhysicalResourceId': physical_id,
+                  'StackId': event.get('StackId', ''),
+                  'RequestId': event.get('RequestId', ''),
+                  'LogicalResourceId': event.get('LogicalResourceId', ''),
+                  'Data': {}
+              }).encode('utf-8')
+              req = urllib.request.Request(url, data=body, method='PUT',
+                                           headers={'Content-Type': ''})
+              try:
+                  urllib.request.urlopen(req, timeout=30)
+                  print(f"CloudFormation response sent: {status}")
+              except Exception as e:
+                  print(f"CloudFormation response error: {e}")
+                  raise
+      Tags:
+        - Key: Application
+          Value: StayNest
+
+  RDSProbeCustomResource:
+    Type: AWS::CloudFormation::CustomResource
+    Condition: CreateRDS
+    DependsOn:
+      - RDSProbeLambda
+      - RDSInstance
+      - NATGateway
+    Properties:
+      ServiceToken: !GetAtt RDSProbeLambda.Arn
+  # === END: WaitCondition Setup ===
 
 
   # ─────────────────────────────────────────────────────────
@@ -896,9 +1157,9 @@ Resources:
           import os
           import urllib.parse
 
-          ses = boto3.client('ses', region_name='us-east-1')
-
           def handler(event, context):
+              region = os.environ.get('AWS_REGION', 'ap-south-1')
+              ses = boto3.client('ses', region_name=region)
               from_email = os.environ['SES_FROM_EMAIL']
               notify_email = os.environ['NOTIFY_EMAIL']
 
@@ -962,29 +1223,36 @@ Resources:
       RetentionInDays: 14
 
   # ─────────────────────────────────────────────────────────
-  # CODEDEPLOY
+  # BACKEND DEPLOY PROJECT (SSM-based, no CodeDeploy needed)
   # ─────────────────────────────────────────────────────────
-  CodeDeployApplication:
-    Type: AWS::CodeDeploy::Application
-    Properties:
-      ApplicationName: staynest-backend
-      ComputePlatform: Server
-
-  CodeDeployDeploymentGroup:
-    Type: AWS::CodeDeploy::DeploymentGroup
+  BackendDeployProject:
+    Type: AWS::CodeBuild::Project
     DependsOn:
+      - CodeDeployRole
       - BackendAutoScalingGroup
-      - CodeDeployApplication
     Properties:
-      ApplicationName: !Ref CodeDeployApplication
-      DeploymentGroupName: staynest-backend-dg
-      ServiceRoleArn: !GetAtt CodeDeployRole.Arn
-      DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      AutoScalingGroups:
-        - !Ref BackendAutoScalingGroup
-      DeploymentStyle:
-        DeploymentType: IN_PLACE
-        DeploymentOption: WITHOUT_TRAFFIC_CONTROL
+      Name: staynest-backend-deploy
+      ServiceRole: !GetAtt CodeDeployRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: ASG_NAME
+            Value: !Ref BackendAutoScalingGroup
+          - Name: ARTIFACT_BUCKET
+            Value: !Ref ArtifactBucket
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: pipeline/buildspec-deploy.yml
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: /staynest/codebuild/deploy
 
   # ─────────────────────────────────────────────────────────
   # CODEBUILD PROJECTS
@@ -1055,7 +1323,7 @@ Resources:
     DependsOn:
       - BackendBuildProject
       - FrontendBuildProject
-      - CodeDeployDeploymentGroup
+      - BackendDeployProject
     Properties:
       Name: staynest-pipeline
       RoleArn: !GetAtt CodePipelineRole.Arn
@@ -1113,13 +1381,12 @@ Resources:
           Actions:
             - Name: DeployBackend
               ActionTypeId:
-                Category: Deploy
+                Category: Build
                 Owner: AWS
-                Provider: CodeDeploy
+                Provider: CodeBuild
                 Version: '1'
               Configuration:
-                ApplicationName: !Ref CodeDeployApplication
-                DeploymentGroupName: !Ref CodeDeployDeploymentGroup
+                ProjectName: !Ref BackendDeployProject
               InputArtifacts:
                 - Name: BackendArtifact
               RunOrder: 1
@@ -1161,13 +1428,19 @@ Outputs:
 
   RDSEndpoint:
     Description: RDS PostgreSQL endpoint
-    Value: !GetAtt RDSInstance.Endpoint.Address
+    Value: !If
+      - CreateRDS
+      - !GetAtt RDSInstance.Endpoint.Address
+      - !Ref ExistingRDSEndpoint
     Export:
       Name: StayNest-RDS-Endpoint
 
   RDSPort:
     Description: RDS PostgreSQL port
-    Value: !GetAtt RDSInstance.Endpoint.Port
+    Value: !If
+      - CreateRDS
+      - !GetAtt RDSInstance.Endpoint.Port
+      - '5432'
     Export:
       Name: StayNest-RDS-Port
 
