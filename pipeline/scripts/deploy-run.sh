@@ -34,15 +34,18 @@ chown ec2-user:ec2-user /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar
 chmod 500 /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar
 systemctl enable staynest
 systemctl start staynest
-sleep 30
-for i in 1 2 3 4 5 6; do
+echo "Waiting 60s for app to start..."
+sleep 60
+for i in 1 2 3 4 5 6 7 8 9 10; do
   HTTP=\$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/health || echo 000)
   echo "Health check \$i: \$HTTP"
   if [ "\$HTTP" = "200" ]; then echo "Deploy successful"; exit 0; fi
-  sleep 15
+  echo "--- App logs ---"
+  journalctl -u staynest --no-pager -n 20
+  sleep 20
 done
-echo "Health check failed"
-journalctl -u staynest --no-pager -n 50
+echo "=== FINAL APP LOGS ==="
+journalctl -u staynest --no-pager -n 100
 exit 1
 SCRIPT
 
