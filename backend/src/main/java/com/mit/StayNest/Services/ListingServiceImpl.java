@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Component
 public class ListingServiceImpl implements ListingService {
 	private static final Logger logger = LoggerFactory.getLogger(ListingServiceImpl.class);
@@ -59,6 +61,7 @@ public class ListingServiceImpl implements ListingService {
 	}
 
 	@Override
+	@Transactional
 	public List<Listing> getAllListing() {
 		logger.info("Fetching all listings");
 		List<Listing> allListing = listingRepo.findAll();
@@ -123,6 +126,7 @@ public class ListingServiceImpl implements ListingService {
 	}
 
 	@Override
+	@Transactional
 	public List<Listing> getListingByOwnerId(long ownerId) {
 		 logger.info("Fetching listings for owner ID: {}", ownerId);
 		Optional<User> optionalUser = userRepo.findById(ownerId);
@@ -136,6 +140,7 @@ public class ListingServiceImpl implements ListingService {
 	}
 
 	@Override
+	@Transactional
 	public List<Listing> searchByArea(String area) {
 		logger.info("Searching listings in area containing: '{}'", area);
 		return listingRepo.findByAddressContaining(area);
@@ -143,6 +148,7 @@ public class ListingServiceImpl implements ListingService {
 	}
 
 	@Override
+	@Transactional
 	public Listing getSpecificListing(Long id) {
 		logger.info("Fetching specific listing with ID: {}", id);
 		Optional<Listing> listing = listingRepo.findById(id);
@@ -159,12 +165,14 @@ public class ListingServiceImpl implements ListingService {
 	}
 
 	@Override
+	@Transactional
 	public List<Listing> searchByGender(String gender) {
 		logger.info("Finding Listings with gender {}" , gender);
 		return listingRepo.findByGender(gender);
 	}
 
 	@Override
+	@Transactional
 	public List<Listing> searchBelowEqualRent(Double rent) {
 		logger.info("Finding Listings below Rent :- {}" , rent);
 		return listingRepo.findByRentLessThanEqual(rent);
