@@ -32,6 +32,20 @@ systemctl stop staynest || true
 aws s3 cp s3://${ARTIFACT_BUCKET}/releases/StayNest-0.0.1-SNAPSHOT.jar /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar
 chown ec2-user:ec2-user /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar
 chmod 500 /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar
+REGION=ap-south-1
+SECRET_JSON=\$(aws secretsmanager get-secret-value --region \$REGION --secret-id staynest/prod --query SecretString --output text)
+cat > /opt/staynest/app.env << ENVEOF
+DB_URL="\$(echo \$SECRET_JSON | jq -r .DB_URL)"
+DB_USERNAME="\$(echo \$SECRET_JSON | jq -r .DB_USERNAME)"
+DB_PASSWORD="\$(echo \$SECRET_JSON | jq -r .DB_PASSWORD)"
+JWT_SECRET="\$(echo \$SECRET_JSON | jq -r .JWT_SECRET)"
+MAIL_USERNAME="\$(echo \$SECRET_JSON | jq -r .MAIL_USERNAME)"
+MAIL_PASSWORD="\$(echo \$SECRET_JSON | jq -r .MAIL_PASSWORD)"
+RESEND_API_KEY="\$(echo \$SECRET_JSON | jq -r .RESEND_API_KEY)"
+CORS_ALLOWED_ORIGINS="\$(echo \$SECRET_JSON | jq -r .CORS_ALLOWED_ORIGINS)"
+PORT=8080
+ENVEOF
+chmod 600 /opt/staynest/app.env
 systemctl enable staynest
 systemctl start staynest
 echo "Waiting 60s for app to start..."
