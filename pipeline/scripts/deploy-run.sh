@@ -102,6 +102,19 @@ post_phase() {
         echo "OK: $INSTANCE_ID"
         break
       elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "TimedOut" ] || [ "$STATUS" = "Cancelled" ]; then
+        echo "=== SSM status details for $INSTANCE_ID ==="
+        aws ssm get-command-invocation \
+          --command-id "$COMMAND_ID" \
+          --instance-id "$INSTANCE_ID" \
+          --query "{Status:Status,StatusDetails:StatusDetails,ResponseCode:ResponseCode}" \
+          --output table
+        echo "=== SSM standard output ==="
+        aws ssm get-command-invocation \
+          --command-id "$COMMAND_ID" \
+          --instance-id "$INSTANCE_ID" \
+          --query "StandardOutputContent" \
+          --output text
+        echo "=== SSM standard error ==="
         aws ssm get-command-invocation \
           --command-id "$COMMAND_ID" \
           --instance-id "$INSTANCE_ID" \
