@@ -61,7 +61,7 @@ public class Listing {
 	@Column(nullable = false, length = 1000)
 	private String description;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "listing_id") // Optional: to avoid a join table
 	private List<RoomTypeDetails> roomDetails;
 

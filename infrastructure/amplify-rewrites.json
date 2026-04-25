@@ -1,0 +1,17 @@
+[
+  {
+    "source": "/api/<*>",
+    "target": "http://staynest-alb-1899319045.ap-south-1.elb.amazonaws.com/<*>",
+    "status": "200"
+  },
+  {
+    "source": "</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json)$)([^.]+$)/>",
+    "target": "/index.html",
+    "status": "200"
+  },
+  {
+    "source": "/<*>",
+    "target": "/index.html",
+    "status": "404-200"
+  }
+]
