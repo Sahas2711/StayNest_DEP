@@ -35,19 +35,6 @@ phases:
   post_build:
     commands:
       - echo "=== Polling SSM command status ==="
-      - |
-        for INSTANCE_ID in $INSTANCE_IDS; do
-          echo "Checking $INSTANCE_ID"
-          for i in $(seq 1 30); do
-            STATUS=$(aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "Status" --output text 2>/dev/null || echo "Pending")
-            echo "  [$i/30] $STATUS"
-            case "$STATUS" in
-              Success) echo "OK: $INSTANCE_ID"; break ;;
-              Failed|TimedOut|Cancelled)
-                aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardErrorContent" --output text
-                exit 1 ;;
-            esac
-            sleep 10
-          done
-        done
+      - INSTANCE_LIST=$(echo $INSTANCE_IDS | tr ' ' ',')
+      - for INSTANCE_ID in $INSTANCE_IDS; do echo "Checking $INSTANCE_ID"; for i in $(seq 1 30); do STATUS=$(aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "Status" --output text 2>/dev/null || echo "Pending"); echo "  [$i/30] $STATUS"; if [ "$STATUS" = "Success" ]; then echo "OK: $INSTANCE_ID"; break; elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "TimedOut" ] || [ "$STATUS" = "Cancelled" ]; then aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardErrorContent" --output text; exit 1; fi; sleep 10; done; done
       - echo "=== Deploy complete ==="
