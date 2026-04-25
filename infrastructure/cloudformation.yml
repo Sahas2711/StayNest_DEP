@@ -704,11 +704,10 @@ Resources:
           phases:
             preBuild:
               commands:
-                - cd frontend
-                - npm install --legacy-peer-deps
+                - npm install --legacy-peer-deps --prefix frontend
             build:
               commands:
-                - npm run build
+                - npm run build --prefix frontend
           artifacts:
             baseDirectory: frontend/build
             files:
@@ -1353,7 +1352,6 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     DependsOn:
       - BackendBuildProject
-      - FrontendBuildProject
       - BackendDeployProject
     Properties:
       Name: staynest-pipeline
@@ -1393,19 +1391,6 @@ Resources:
                 - Name: SourceArtifact
               OutputArtifacts:
                 - Name: BackendArtifact
-              RunOrder: 1
-            - Name: BuildFrontend
-              ActionTypeId:
-                Category: Build
-                Owner: AWS
-                Provider: CodeBuild
-                Version: '1'
-              Configuration:
-                ProjectName: !Ref FrontendBuildProject
-              InputArtifacts:
-                - Name: SourceArtifact
-              OutputArtifacts:
-                - Name: FrontendArtifact
               RunOrder: 1
 
         - Name: Deploy

@@ -13,7 +13,7 @@
   },
   {
     "ParameterKey": "EC2InstanceType",
-    "ParameterValue": "t2.micro"
+    "ParameterValue": "t3.micro"
   },
   {
     "ParameterKey": "EC2KeyPairName",
