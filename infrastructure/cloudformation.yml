@@ -16,7 +16,7 @@ Parameters:
     AllowedValues: [db.t3.micro, db.t3.small, db.t3.medium]
   EC2InstanceType:
     Type: String
-    Default: t2.micro
+    Default: t3.micro
     AllowedValues: [t2.micro, t2.small, t3.micro, t3.small]
   EC2KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -30,6 +30,13 @@ Parameters:
     Default: main
   GitHubConnectionArn:
     Type: String
+  GitHubToken:
+    Type: String
+    NoEcho: true
+    Description: >
+      GitHub Personal Access Token with repo scope.
+      Used by Amplify to connect to your repository and auto-build on push.
+      Create at https://github.com/settings/tokens
   SESFromEmail:
     Type: String
     Description: Verified SES sender email address
@@ -49,39 +56,31 @@ Conditions:
 
 
 Mappings:
-  RegionAMI:
-    us-east-1:
-      AMI: ami-0c02fb55956c7d316
-    ap-south-1:
-      AMI: ami-0f58b397bc5c1f2e8
-    us-east-2:
-      AMI: ami-0b0dcb5067f052a63
-    us-west-2:
-      AMI: ami-0ceecbb0f30a902a6
-    eu-west-1:
-      AMI: ami-0d71ea30463e0ff49
-    ap-southeast-1:
-      AMI: ami-0c802847a7dd848c0
-
   RegionAZ:
     us-east-1:
       AZA: us-east-1a
       AZB: us-east-1b
+      AZC: us-east-1c
     ap-south-1:
       AZA: ap-south-1a
       AZB: ap-south-1b
+      AZC: ap-south-1c
     us-east-2:
       AZA: us-east-2a
       AZB: us-east-2b
+      AZC: us-east-2c
     us-west-2:
       AZA: us-west-2a
       AZB: us-west-2b
+      AZC: us-west-2c
     eu-west-1:
       AZA: eu-west-1a
       AZB: eu-west-1b
+      AZC: eu-west-1c
     ap-southeast-1:
       AZA: ap-southeast-1a
       AZB: ap-southeast-1b
+      AZC: ap-southeast-1c
 
 Resources:
 
@@ -149,6 +148,40 @@ Resources:
       Tags:
         - Key: Name
           Value: staynest-private-app-subnet-a
+
+  PrivateAppSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.6.0/24
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZB]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: staynest-private-app-subnet-b
+
+  PrivateAppSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateAppSubnetB
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateAppSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.7.0/24
+      AvailabilityZone: !FindInMap [RegionAZ, !Ref AWS::Region, AZC]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: staynest-private-app-subnet-c
+
+  PrivateAppSubnetCRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateAppSubnetC
+      RouteTableId: !Ref PrivateRouteTable
 
   PrivateDBSubnetB:
     Type: AWS::EC2::Subnet
@@ -588,17 +621,14 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:PutObject
-                  - s3:DeleteObject
-                  - s3:ListBucket
-                  - s3:GetObject
-                Resource:
-                  - !Sub arn:aws:s3:::staynest-frontend-${AWS::AccountId}-${AWS::Region}
-                  - !Sub arn:aws:s3:::staynest-frontend-${AWS::AccountId}-${AWS::Region}/*
-              - Effect: Allow
-                Action:
-                  - cloudfront:CreateInvalidation
-                Resource: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
+                  - amplify:StartDeployment
+                  - amplify:CreateDeployment
+                  - amplify:GetApp
+                  - amplify:GetBranch
+                  - amplify:GetJob
+                  - amplify:ListJobs
+                  - amplify:StartJob
+                Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/*
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
@@ -608,6 +638,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:GetObject
+                  - s3:PutObject
                   - s3:ListBucket
                 Resource:
                   - !GetAtt ArtifactBucket.Arn
@@ -638,35 +669,71 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  FrontendBucket:
-    Type: AWS::S3::Bucket
+  # ─────────────────────────────────────────────────────────
+  # AMPLIFY (Frontend hosting — replaces S3 + CloudFront)
+  # ─────────────────────────────────────────────────────────
+  AmplifyServiceRole:
+    Type: AWS::IAM::Role
     Properties:
-      BucketName: !Sub staynest-frontend-${AWS::AccountId}-${AWS::Region}
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-
-  FrontendBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    DependsOn: CloudFrontDistribution
-    Properties:
-      Bucket: !Ref FrontendBucket
-      PolicyDocument:
+      RoleName: !Sub staynest-amplify-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              Service: cloudfront.amazonaws.com
-            Action: s3:GetObject
-            Resource: !Sub ${FrontendBucket.Arn}/*
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
+              Service: amplify.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess-Amplify
+
+  AmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: staynest-frontend
+      Repository: !Sub https://github.com/${GitHubOwner}/${GitHubRepo}
+      AccessToken: !Ref GitHubToken
+      IAMServiceRole: !GetAtt AmplifyServiceRole.Arn
+      EnvironmentVariables:
+        - Name: REACT_APP_API_BASE_URL
+          Value: !Sub http://${ALB.DNSName}
+        - Name: GENERATE_SOURCEMAP
+          Value: 'false'
+      BuildSpec: |
+        version: 1
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - cd frontend
+                - npm install --legacy-peer-deps
+            build:
+              commands:
+                - npm run build
+          artifacts:
+            baseDirectory: frontend/build
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - frontend/node_modules/**/*
+      CustomRules:
+        - Source: '</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json)$)([^.]+$)/>'
+          Target: /index.html
+          Status: '200'
+        - Source: '/<*>'
+          Target: /index.html
+          Status: '404-200'
+
+  AmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt AmplifyApp.AppId
+      BranchName: !Ref GitHubBranch
+      EnableAutoBuild: true
+      Stage: PRODUCTION
+      EnvironmentVariables:
+        - Name: REACT_APP_API_BASE_URL
+          Value: !Sub http://${ALB.DNSName}
 
   UploadsBucket:
     Type: AWS::S3::Bucket
@@ -688,50 +755,6 @@ Resources:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
             Function: !GetAtt S3NotifierLambda.Arn
-
-
-  # ─────────────────────────────────────────────────────────
-  # CLOUDFRONT
-  # ─────────────────────────────────────────────────────────
-  CloudFrontOAC:
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig:
-        Name: staynest-frontend-oac
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
-
-  CloudFrontDistribution:
-    Type: AWS::CloudFront::Distribution
-    DependsOn: FrontendBucket
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        DefaultRootObject: index.html
-        HttpVersion: http2
-        Origins:
-          - Id: S3FrontendOrigin
-            DomainName: !GetAtt FrontendBucket.RegionalDomainName
-            S3OriginConfig:
-              OriginAccessIdentity: ''
-            OriginAccessControlId: !GetAtt CloudFrontOAC.Id
-        DefaultCacheBehavior:
-          TargetOriginId: S3FrontendOrigin
-          ViewerProtocolPolicy: redirect-to-https
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
-          AllowedMethods: [GET, HEAD, OPTIONS]
-          Compress: true
-        CustomErrorResponses:
-          - ErrorCode: 403
-            ResponseCode: 200
-            ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 0
-          - ErrorCode: 404
-            ResponseCode: 200
-            ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 0
-        PriceClass: PriceClass_100
 
 
   # ─────────────────────────────────────────────────────────
@@ -797,7 +820,8 @@ Resources:
     Properties:
       LaunchTemplateName: staynest-backend-lt
       LaunchTemplateData:
-        ImageId: !FindInMap [RegionAMI, !Ref AWS::Region, AMI]
+        # Dynamic AMI lookup - always gets latest Amazon Linux 2 for the region
+        ImageId: '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}'
         InstanceType: !Ref EC2InstanceType
         KeyName: !Ref EC2KeyPairName
         IamInstanceProfile:
@@ -811,7 +835,7 @@ Resources:
             yum update -y
             yum install -y java-17-amazon-corretto wget jq
 
-            # SSM agent is pre-installed on Amazon Linux 2 — ensure it's running
+            # SSM agent is pre-installed on Amazon Linux 2 - ensure it's running
             systemctl enable amazon-ssm-agent
             systemctl start amazon-ssm-agent
 
@@ -869,7 +893,11 @@ Resources:
             SVCEOF
 
             systemctl daemon-reload
-            systemctl enable staynest
+            # Do NOT enable or start staynest yet - no JAR deployed.
+            # The first CodePipeline run will deploy the JAR and start the service.
+            # Mark instance ready for SSM-based deploy.
+            touch /opt/staynest/.instance-ready
+            echo "EC2 bootstrap complete. Waiting for first deploy via CodePipeline."
         TagSpecifications:
           - ResourceType: instance
             Tags:
@@ -890,13 +918,15 @@ Resources:
         Version: !GetAtt BackendLaunchTemplate.LatestVersionNumber
       MinSize: 1
       MaxSize: 4
-      DesiredCapacity: 2
+      DesiredCapacity: 1
       VPCZoneIdentifier:
         - !Ref PrivateAppSubnetA
+        - !Ref PrivateAppSubnetB
+        - !Ref PrivateAppSubnetC
       TargetGroupARNs:
         - !Ref ALBTargetGroup
-      HealthCheckType: ELB
-      HealthCheckGracePeriod: 120
+      HealthCheckType: EC2
+      HealthCheckGracePeriod: 300
       Tags:
         - Key: Name
           Value: staynest-backend
@@ -1029,7 +1059,8 @@ Resources:
         Variables:
           RDS_HOST: !GetAtt RDSInstance.Endpoint.Address
           RDS_PORT: !GetAtt RDSInstance.Endpoint.Port
-          WAIT_HANDLE_URL: !Ref RDSWaitHandle      Code:
+          WAIT_HANDLE_URL: !Ref RDSWaitHandle
+      Code:
         ZipFile: |
           import socket
           import time
@@ -1044,7 +1075,7 @@ Resources:
               cfn_response_url = event.get('ResponseURL', '')
               physical_id = event.get('PhysicalResourceId', 'RDSProbe')
 
-              # Stack deletion — respond success immediately to both
+              # Stack deletion - respond success immediately to both
               if event.get('RequestType') == 'Delete':
                   send_cfn_response(cfn_response_url, event, 'SUCCESS', physical_id, 'Delete OK')
                   return
@@ -1093,7 +1124,7 @@ Resources:
 
           def send_cfn_response(url, event, status, physical_id, reason):
               if not url:
-                  print(f"No ResponseURL — skipping cfn response (status={status})")
+                  print(f"No ResponseURL - skipping cfn response (status={status})")
                   return
               body = json.dumps({
                   'Status': status,
@@ -1287,7 +1318,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     DependsOn:
       - FrontendDeployRole
-      - CloudFrontDistribution
+      - AmplifyBranch
     Properties:
       Name: staynest-frontend-build
       ServiceRole: !GetAtt FrontendDeployRole.Arn
@@ -1298,10 +1329,10 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:7.0
         EnvironmentVariables:
-          - Name: FRONTEND_BUCKET
-            Value: !Ref FrontendBucket
-          - Name: CLOUDFRONT_DISTRIBUTION_ID
-            Value: !Ref CloudFrontDistribution
+          - Name: AMPLIFY_APP_ID
+            Value: !GetAtt AmplifyApp.AppId
+          - Name: AMPLIFY_BRANCH
+            Value: !Ref GitHubBranch
           - Name: REACT_APP_API_BASE_URL
             Value: !Sub http://${ALB.DNSName}
       Source:
@@ -1403,14 +1434,14 @@ Outputs:
       Name: StayNest-ALB-DNS
 
   CloudFrontURL:
-    Description: CloudFront distribution URL (frontend)
-    Value: !Sub https://${CloudFrontDistribution.DomainName}
+    Description: Amplify hosted frontend URL
+    Value: !Sub https://${GitHubBranch}.${AmplifyApp.AppId}.amplifyapp.com
     Export:
       Name: StayNest-CloudFront-URL
 
   FrontendBucketName:
-    Description: S3 bucket hosting the React build
-    Value: !Ref FrontendBucket
+    Description: Amplify App ID
+    Value: !GetAtt AmplifyApp.AppId
     Export:
       Name: StayNest-Frontend-Bucket
 

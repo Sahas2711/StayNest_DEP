@@ -36,6 +36,10 @@
     "ParameterValue": "arn:aws:codestar-connections:us-east-1:ACCOUNT_ID:connection/CONNECTION_ID"
   },
   {
+    "ParameterKey": "GitHubToken",
+    "ParameterValue": "REPLACE_WITH_GITHUB_PAT_TOKEN"
+  },
+  {
     "ParameterKey": "SESFromEmail",
     "ParameterValue": "REPLACE_WITH_VERIFIED_SES_EMAIL"
   },

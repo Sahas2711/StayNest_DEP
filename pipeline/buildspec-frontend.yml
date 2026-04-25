@@ -2,7 +2,6 @@ version: 0.2
 
 env:
   variables:
-    # REACT_APP_API_BASE_URL is injected by CodeBuild environment (set in CloudFormation)
     GENERATE_SOURCEMAP: "false"
 
 phases:
@@ -13,30 +12,60 @@ phases:
       - echo "=== Installing frontend dependencies ==="
       - node -v
       - npm -v
-      - cd frontend
-      - npm install --legacy-peer-deps
+      - npm install --legacy-peer-deps --prefix frontend
 
   pre_build:
     commands:
-      - echo "=== REACT_APP_API_BASE_URL is ${REACT_APP_API_BASE_URL} ==="
+      - echo "REACT_APP_API_BASE_URL is ${REACT_APP_API_BASE_URL}"
+      - echo "AMPLIFY_APP_ID is ${AMPLIFY_APP_ID}, branch ${AMPLIFY_BRANCH}"
 
   build:
     commands:
       - echo "=== Building React application ==="
-      - cd frontend
-      - npm run build
-      - echo "=== Frontend build complete ==="
+      - npm run build --prefix frontend
+      - echo "=== Build complete ==="
+      - ls -lh frontend/build/
 
   post_build:
     commands:
-      - echo "=== Deploying frontend to S3 ==="
-      - cd frontend
-      # Sync build output to S3, delete stale files
-      - aws s3 sync build/ s3://${FRONTEND_BUCKET}/ --delete --cache-control "public,max-age=31536000,immutable" --exclude "index.html"
-      - aws s3 cp build/index.html s3://${FRONTEND_BUCKET}/index.html --cache-control "no-cache,no-store,must-revalidate"
-      - echo "=== Invalidating CloudFront cache ==="
-      - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
-      - echo "=== Frontend deployment complete ==="
+      - echo "=== Deploying to Amplify ==="
+      - zip -r build.zip frontend/build/
+      - |
+        DEPLOY_RESPONSE=$(aws amplify create-deployment \
+          --app-id "$AMPLIFY_APP_ID" \
+          --branch-name "$AMPLIFY_BRANCH" \
+          --output json)
+      - JOB_ID=$(echo "$DEPLOY_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['jobId'])")
+      - UPLOAD_URL=$(echo "$DEPLOY_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['zipUploadUrl'])")
+      - echo "Uploading build zip (job $JOB_ID)..."
+      - curl -X PUT -H "Content-Type: application/zip" --data-binary @build.zip "$UPLOAD_URL"
+      - echo "Starting Amplify deployment..."
+      - |
+        aws amplify start-deployment \
+          --app-id "$AMPLIFY_APP_ID" \
+          --branch-name "$AMPLIFY_BRANCH" \
+          --job-id "$JOB_ID"
+      - echo "=== Waiting for Amplify deployment ==="
+      - |
+        for i in $(seq 1 30); do
+          STATUS=$(aws amplify get-job \
+            --app-id "$AMPLIFY_APP_ID" \
+            --branch-name "$AMPLIFY_BRANCH" \
+            --job-id "$JOB_ID" \
+            --query "job.summary.status" \
+            --output text)
+          echo "[$i/30] Amplify status: $STATUS"
+          if [ "$STATUS" = "SUCCEED" ]; then
+            echo "Amplify deployment succeeded."
+            exit 0
+          elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "CANCELLED" ]; then
+            echo "Amplify deployment failed: $STATUS"
+            exit 1
+          fi
+          sleep 20
+        done
+        echo "Amplify deployment timed out."
+        exit 1
 
 artifacts:
   files:

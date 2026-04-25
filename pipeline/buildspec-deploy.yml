@@ -46,16 +46,16 @@ phases:
             "aws s3 cp s3://'"${ARTIFACT_BUCKET}"'/releases/StayNest-0.0.1-SNAPSHOT.jar /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar",
             "chown ec2-user:ec2-user /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar",
             "chmod 500 /opt/staynest/StayNest-0.0.1-SNAPSHOT.jar",
-            "echo \"Starting staynest service...\"",
+            "echo \"Enabling and starting staynest service...\"",
+            "systemctl enable staynest",
             "systemctl start staynest",
             "echo \"Waiting for health check...\"",
-            "sleep 20",
-            "HTTP=$(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/health || echo 000)",
-            "if [ \"$HTTP\" != \"200\" ]; then echo \"Health check failed: $HTTP\"; journalctl -u staynest --no-pager -n 50; exit 1; fi",
-            "echo \"Deploy successful on $(hostname)\""
+            "sleep 30",
+            "for i in 1 2 3 4 5 6; do HTTP=$(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/health || echo 000); echo \"Health check attempt $i: $HTTP\"; if [ \"$HTTP\" = \"200\" ]; then echo \"Deploy successful on $(hostname)\"; exit 0; fi; sleep 15; done",
+            "echo \"Health check failed after retries\"; journalctl -u staynest --no-pager -n 50; exit 1"
           ]' \
           --comment "StayNest deploy $(date +%Y%m%d%H%M%S)" \
-          --timeout-seconds 180 \
+          --timeout-seconds 300 \
           --query "Command.CommandId" \
           --output text)
       - echo "SSM Command ID: $COMMAND_ID"
