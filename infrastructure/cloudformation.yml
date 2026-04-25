@@ -1280,6 +1280,8 @@ Resources:
             Value: !Ref ArtifactBucket
           - Name: AWS_ACCOUNT_ID
             Value: !Ref AWS::AccountId
+          - Name: SES_FROM_EMAIL
+            Value: !Ref SESFromEmail
       Source:
         Type: CODEPIPELINE
         BuildSpec: pipeline/buildspec-deploy.yml
