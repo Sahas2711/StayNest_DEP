@@ -2,15 +2,10 @@ package com.mit.StayNest.Services;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.mit.StayNest.Entity.Owner;
 import com.mit.StayNest.Repository.OwnerRepository;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +24,7 @@ public class OwnerServiceImpl implements OwnerService {
 	private MailService mailService;
 
 	@Autowired
-	private JavaMailSender javaMailSender;
+	private EmailService emailService;
 
 	public Owner register(Owner owner) {
 	    logger.info("Attempting to register owner with email: {}", owner.getEmail());
@@ -175,17 +170,10 @@ public class OwnerServiceImpl implements OwnerService {
                 + "</html>";
 
 	    try {
-	        MimeMessage message = javaMailSender.createMimeMessage();
-	        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-	        helper.setTo(email);
-	        helper.setSubject(subject);
-	        helper.setText(htmlBody, true);
-	         helper.setFrom("noreply@staynest.com");
-	      //  javaMailSender.send(message);
+	        emailService.sendEmail(email, subject, htmlBody);
 	        logger.info("Welcome email sent to: {}", email);
-	    } catch (MessagingException e) {
+	    } catch (RuntimeException e) {
 	        logger.error("Failed to send welcome email to {}: {}", email, e.getMessage());
-	        // Don't interrupt registration if email fails
 	    }
 
 	    logger.info("Owner registered successfully with ID: {}", savedOwner.getId());

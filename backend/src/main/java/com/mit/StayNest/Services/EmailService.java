@@ -8,9 +8,6 @@ import com.mit.StayNest.Entity.Booking;
 import com.mit.StayNest.Entity.Listing;
 import com.mit.StayNest.Entity.Owner;
 import com.mit.StayNest.Entity.User;
-
-import com.mit.StayNest.Services.ResendEmailClient;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -22,15 +19,15 @@ public class EmailService {
 
    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    private final ResendEmailClient resendEmailClient;
+    private final SesEmailClient sesEmailClient;
 
-    public EmailService(ResendEmailClient resendEmailClient) {
-        this.resendEmailClient = resendEmailClient;
+    public EmailService(SesEmailClient sesEmailClient) {
+        this.sesEmailClient = sesEmailClient;
     }
 
     public void sendEmail(String to, String subject, String htmlContent) {
         try {
-            resendEmailClient.sendHtmlEmail(to, subject, htmlContent);
+            sesEmailClient.sendHtmlEmail(to, subject, htmlContent);
         } catch (Exception e) {
             logger.error("Email send failed to {}", to, e);
             throw new RuntimeException("Email sending failed", e);

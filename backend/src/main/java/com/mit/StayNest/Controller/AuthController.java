@@ -41,6 +41,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 public class AuthController {
@@ -69,10 +70,10 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
 
-    @Autowired 
-    private JavaMailSender javaMailSender;
+    @Value("${app.frontend.base-url}")
+    private String frontendBaseUrl;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     
     @PostMapping("/login/user")
@@ -215,13 +216,8 @@ public class AuthController {
         	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with this email does not exist.");
         }
      // Construct the reset link. Make sure this matches your frontend's reset password route.
-        String resetLink = "https://staynest-dep.onrender.com/reset-password?email=" + email; // Use your actual domain in production
-
-        String subject = "Reset Your Password - StayNest";
-
-        // The detailed HTML email template
-
-      //  emailService.sendForgotPasswordOtpEmail(email,userName , resetLink);
+        String resetLink = frontendBaseUrl + "/reset-password?email=" + email;
+        emailService.sendForgotPasswordOtpEmail(email, userName, resetLink);
         return ResponseEntity.status(HttpStatus.OK).body("Reset Link sent successfully");
     }
     

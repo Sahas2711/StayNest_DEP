@@ -7,18 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mit.StayNest.Entity.User;
 import com.mit.StayNest.Repository.UserRepository;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,9 +24,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private EmailService emailService;
-    
-    @Autowired
-    private JavaMailSender javaMailSender;
     
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -65,7 +55,7 @@ public class UserServiceImpl implements UserService {
         String subject = "Welcome to StayNest! Your Nest Away From Home Awaits!";
 
         String htmlBody = emailService.genrateWelcomeMessage(userName, browsePgLink, contactFaqLink);
-        //emailService.sendEmail(user.getEmail(), subject, htmlBody);
+        emailService.sendEmail(user.getEmail(), subject, htmlBody);
 
         logger.info("Welcome email sent to: {}", user.getEmail());
 
