@@ -1,7 +1,7 @@
 // src/services/ReviewService.js
 import axios from 'axios';
 
-const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL || ''}/review`;
+const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL || 'https://staynest-alb-1899319045.ap-south-1.elb.amazonaws.com'}/review`;
 
 const getToken = () => localStorage.getItem('token');
 

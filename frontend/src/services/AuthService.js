@@ -2,7 +2,7 @@
 import axios from 'axios';
 import api from './ApiService';
 
-const API_URL = process.env.REACT_APP_API_BASE_URL || '';
+const API_URL = process.env.REACT_APP_API_BASE_URL || 'https://staynest-alb-1899319045.ap-south-1.elb.amazonaws.com';
 
 const login = async (data) => {
   const res = await axios.post(`${API_URL}/login/user`, data);

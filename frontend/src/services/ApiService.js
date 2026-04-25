@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || '',
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://staynest-alb-1899319045.ap-south-1.elb.amazonaws.com',
 });
 
 api.interceptors.request.use((config) => {
