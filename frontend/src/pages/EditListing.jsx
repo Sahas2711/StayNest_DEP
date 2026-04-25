@@ -180,7 +180,8 @@ const EditListing = () => {
             } catch (uploadError) {
                 console.error('Error uploading image to S3:', uploadError);
                 setFormData(prev => ({ ...prev, error: true }));
-                alert('Failed to upload new images. Please try again.');
+                const message = uploadError?.response?.data?.message || 'Failed to upload new images. Please try again.';
+                alert(message);
                 return;
             }
         }

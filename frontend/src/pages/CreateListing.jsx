@@ -131,7 +131,8 @@ const CreateListing = () => {
                 uploadedImageUrls = await uploadListingImages(photos);
             } catch (uploadError) {
                 console.error('Error uploading image to S3:', uploadError);
-                alert('Failed to upload images. Please try again.');
+                const message = uploadError?.response?.data?.message || 'Failed to upload images. Please try again.';
+                alert(message);
                 return;
             }
         }

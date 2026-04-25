@@ -58,6 +58,10 @@ public class UploadController {
             logger.error("Failed to upload image(s)", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to upload image(s)."));
+        } catch (Exception e) {
+            logger.error("Unexpected upload failure", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Unexpected upload failure: " + e.getClass().getSimpleName()));
         }
     }
 
