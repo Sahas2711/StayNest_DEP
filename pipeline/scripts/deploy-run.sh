@@ -64,6 +64,7 @@ SCRIPT
 }
 
 post_phase() {
+  [ -f /tmp/command_id.txt ] || { echo "No command ID found, skipping poll."; exit 0; }
   INSTANCE_IDS=$(cat /tmp/instance_ids.txt)
   COMMAND_ID=$(cat /tmp/command_id.txt)
 
