@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaWifi, FaSnowflake, FaUtensils, FaTshirt, FaVideo, FaCar, FaUsers, FaGraduationCap, FaUpload, FaCheck, FaPlus, FaTimes, FaArrowLeft } from 'react-icons/fa';
 import '../styles/CreateListing.css'; // Assuming shared styles
 import api from '../services/ApiService';
-import axios from 'axios'; // Import axios for Cloudinary upload
+import { uploadListingImages } from '../services/UploadService';
 
 const EditListing = () => {
     const { listingId } = useParams();
@@ -32,10 +32,6 @@ const EditListing = () => {
     const [photos, setPhotos] = useState([]); // Store actual File objects for upload
     const [existingImageUrls, setExistingImageUrls] = useState([]); // Store existing image URLs
     const fileInputRef = useRef(null);
-
-    // --- Cloudinary Configuration ---
-    const CLOUD_NAME = 'dqzdhaxkv';
-    const UPLOAD_PRESET = 'Staynest';
 
     const amenitiesList = [
         { id: 'wifi', name: 'WiFi', icon: <FaWifi /> },
@@ -176,20 +172,15 @@ const EditListing = () => {
 
         let uploadedImageUrls = [...existingImageUrls]; // Start with existing URLs
 
-        // 1. Upload new images to Cloudinary
+        // 1. Upload new images to S3 through the backend
         if (photos.length > 0) {
             try {
-                for (const photo of photos) {
-                    const cloudinaryData = new FormData();
-                    cloudinaryData.append('file', photo);
-                    cloudinaryData.append('upload_preset', UPLOAD_PRESET);
-                    const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, cloudinaryData);
-                    uploadedImageUrls.push(res.data.secure_url);
-                }
-            } catch (cloudinaryError) {
-                console.error('Error uploading image to Cloudinary:', cloudinaryError);
+                const newImageUrls = await uploadListingImages(photos);
+                uploadedImageUrls.push(...newImageUrls);
+            } catch (uploadError) {
+                console.error('Error uploading image to S3:', uploadError);
                 setFormData(prev => ({ ...prev, error: true }));
-                alert('Failed to upload new images. Please check your upload preset and try again.');
+                alert('Failed to upload new images. Please try again.');
                 return;
             }
         }
@@ -318,8 +309,6 @@ const EditListing = () => {
                         </div>
                     </section>
 
-                    ---
-
                     {/* Room Details (New Section) */}
                     <section className="form-section">
                         <div className="section-header">
@@ -399,8 +388,6 @@ const EditListing = () => {
                         )}
                     </section>
 
-                    ---
-
                     {/* Amenities */}
                     <section className="form-section">
                         <div className="section-header">
@@ -423,8 +410,6 @@ const EditListing = () => {
                             </div>
                         </div>
                     </section>
-
-                    ---
 
                     {/* Upload Photos */}
                     <section className="form-section">
@@ -466,8 +451,6 @@ const EditListing = () => {
                         </div>
                     </section>
 
-                    ---
-
                     {/* Pricing */}
                     <section className="form-section">
                         <h2>Additional Pricing Details</h2>
@@ -486,8 +469,6 @@ const EditListing = () => {
                             </div>
                         </div>
                     </section>
-
-                    ---
 
                     {/* Submit */}
                     <section className="submit-section">

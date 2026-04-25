@@ -5,8 +5,8 @@ import {
     FaUsers, FaGraduationCap, FaUpload, FaCheck, FaPlus, FaTimes
 } from 'react-icons/fa';
 import api from '../services/ApiService'; // Assuming ApiService is correctly configured
+import { uploadListingImages } from '../services/UploadService';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios for Cloudinary upload
 
 const CreateListing = () => {
     const navigate = useNavigate();
@@ -34,11 +34,6 @@ const CreateListing = () => {
 
     const [photos, setPhotos] = useState([]); // Store actual File objects for upload
     const fileInputRef = useRef(null);
-
-    // --- Cloudinary Configuration ---
-    const CLOUD_NAME = 'dqzdhaxkv';
-    const UPLOAD_PRESET = 'Staynest';
-
     const amenitiesList = [
         { id: 'wifi', name: 'WiFi', icon: <FaWifi /> },
         { id: 'ac', name: 'AC', icon: <FaSnowflake /> },
@@ -130,23 +125,13 @@ const CreateListing = () => {
 
         let uploadedImageUrls = [];
 
-        // 1. Upload images to Cloudinary
+        // 1. Upload images to S3 through the backend
         if (photos.length > 0) {
             try {
-                for (const photo of photos) {
-                    const cloudinaryData = new FormData();
-                    cloudinaryData.append('file', photo);
-                    cloudinaryData.append('upload_preset', UPLOAD_PRESET);
-
-                    const res = await axios.post(
-                        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-                        cloudinaryData
-                    );
-                    uploadedImageUrls.push(res.data.secure_url);
-                }
-            } catch (cloudinaryError) {
-                console.error('Error uploading image to Cloudinary:', cloudinaryError);
-                alert('Failed to upload images. Please check your upload preset and try again.');
+                uploadedImageUrls = await uploadListingImages(photos);
+            } catch (uploadError) {
+                console.error('Error uploading image to S3:', uploadError);
+                alert('Failed to upload images. Please try again.');
                 return;
             }
         }

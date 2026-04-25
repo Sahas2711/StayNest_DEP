@@ -6,6 +6,7 @@ import '../styles/BookPG.css';
 import TenantDashboardNavbar from '../components/TenantDashboardNavbar';
 import bookingService from '../services/BookingService';
 import { getReviewsByListing } from '../services/ReviewService';
+import api from '../services/ApiService';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -102,7 +103,7 @@ const BookPG = () => {
   useEffect(() => {
     const fetchPGData = async () => {
       try {
-        const res = await axios.get(`https://staynest-backend-dymh.onrender.com/listing/${id}`);
+        const res = await api.get(`/listing/${id}`);
         const data = res.data;
         console.log('Fetched PG Data:', data);
 
