@@ -9,11 +9,8 @@ import com.mit.StayNest.Entity.User;
 import com.mit.StayNest.Repository.BookingRepository;
 import com.mit.StayNest.Repository.ListingRepository;
 import com.mit.StayNest.Services.ListingServiceImpl;
-import jakarta.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +27,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
-    
-    @Autowired
-    private JavaMailSender javaMailSender;
 
     @Autowired
     private ListingServiceImpl listingServiceImpl;
