@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../styles/ForgotPassword.css';
 import authService from '../services/AuthService';
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -26,14 +25,12 @@ const ForgotPassword = () => {
   setError('');
 
   try {
-    //console.log('Forgot password request for:', email);
     await authService.forgotPassword(email);
-    //alert("A password reset link has been sent to your email address.");
-    navigate("/reset-password");
     setIsSuccess(true);
   } catch (err) {
     setError(
       err?.response?.data?.message ||
+      err?.response?.data ||
       "User not found. Please check your email or register if you don't have an account."
     );
   } finally {
@@ -68,7 +65,7 @@ const ForgotPassword = () => {
               We've sent a password reset link to <strong>{email}</strong>
             </p>
             <p className="success-subtitle">
-              Click the link in your email to reset your password. The link will expire in 1 hour.
+              Click the link in your email to reset your password.
             </p>
             
             <button 

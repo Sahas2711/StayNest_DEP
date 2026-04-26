@@ -7,7 +7,7 @@
 set -e
 
 STACK_NAME="staynest-infra"
-REGION="us-east-1"
+REGION="${AWS_REGION:-${AWS_DEFAULT_REGION:-ap-south-1}}"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --region "$REGION")
 TEMPLATE_FILE="infrastructure/cloudformation.yml"
 PARAMS_FILE="infrastructure/parameters.json"

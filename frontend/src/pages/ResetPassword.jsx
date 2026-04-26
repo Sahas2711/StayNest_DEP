@@ -5,7 +5,9 @@ import authService from '../services/AuthService';
 import { useLocation } from 'react-router-dom';
 
 const ResetPassword = () => {
- const [email , setEmail] = useState('');
+  const location = useLocation();
+  const initialEmail = new URLSearchParams(location.search).get('email') || '';
+  const [email , setEmail] = useState(initialEmail);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,15 +17,14 @@ const ResetPassword = () => {
   const validateEmail = (email) => {
     return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
-const location = useLocation();
-//const queryParams = new URLSearchParams(location.search);
-//const email = queryParams.get('email');
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    //console.log('Resetting password for:', email);
-    
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
     if (!newPassword || !confirmPassword) {
       setError('Please fill in all fields.');
       return;
@@ -36,15 +37,20 @@ const location = useLocation();
       setError('Passwords do not match.');
       return;
     }
-    // Simulate API call
-    const res = authService.resetPassword({ email, password:newPassword });
-   // console.log(res);
-    setError('');
+
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await authService.resetPassword({ email, password:newPassword });
       setIsLoading(false);
       setIsSuccess(true);
-    }, 1500);
+    } catch (err) {
+      setIsLoading(false);
+      setError(
+        err?.response?.data?.message ||
+        err?.response?.data ||
+        'Unable to reset password. Please try again.'
+      );
+    }
   };
 
   if (isSuccess) {

@@ -203,8 +203,12 @@ public class AuthController {
 
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Email is required."));
+        }
         Optional<User> userOpt = userRepo.findByEmail(email);
         Optional<Owner> ownerOpt = ownerRepo.findByEmail(email);
         String userName;
@@ -213,16 +217,18 @@ public class AuthController {
         } else if(ownerOpt.isPresent()){
         	 userName = ownerOpt.get().getName();
         }else {
-        	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with this email does not exist.");
+        	return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User with this email does not exist."));
         }
      // Construct the reset link. Make sure this matches your frontend's reset password route.
         String resetLink = frontendBaseUrl + "/reset-password?email=" + email;
         emailService.sendForgotPasswordOtpEmail(email, userName, resetLink);
-        return ResponseEntity.status(HttpStatus.OK).body("Reset Link sent successfully");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "Reset link sent successfully."));
     }
     
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
+    public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
     	logger.info("Reset password request initiated for {}",email);
         Optional<User> userOpt = userRepo.findByEmail(email);
         Optional<Owner> ownerOpt = ownerRepo.findByEmail(email);
@@ -231,17 +237,18 @@ public class AuthController {
             user.setPassword(passwordEncoder.encode(newPassword));
             logger.info("Password reset successful for {}",email);
             userRepo.save(user);
-            return ResponseEntity.ok("Password updated successfully.");
+            return ResponseEntity.ok(Map.of("message", "Password updated successfully."));
         }else if(ownerOpt.isPresent()) {
         	Owner owner = ownerOpt.get();
         	owner.setPassword(passwordEncoder.encode(newPassword));
             ownerRepo.save(owner);
             logger.info("Password reset successful for {}",email);
-            return ResponseEntity.ok("Password updated successfully.");
+            return ResponseEntity.ok(Map.of("message", "Password updated successfully."));
         }
         else {
         	logger.warn("User or owner dosen't exist with mail");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found."));
         }
     }
 
